@@ -2,15 +2,13 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 import os
 
-# Токен из переменных окружения (безопасность!)
-TOKEN = os.getenv("TELEGRAM_TOKEN")
-
-bot = Bot(token=TOKEN)
+bot = Bot(token=os.getenv("TELEGRAM_TOKEN"))
 dp = Dispatcher(bot)
 
+# Ответ на /start (строго по ТЗ)
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await message.answer("🚀 Добро пожаловать в Stargram!")
+    await message.answer("👋 Бот Stargram активирован! Он работает только для передачи данных сайту.")
 
 if __name__ == '__main__':
     executor.start_polling(dp)

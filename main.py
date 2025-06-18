@@ -10,7 +10,7 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await message.answer("🚀 Добро пожаловать в NovaCoinBot!")
+    await message.answer("🚀 Добро пожаловать в Stargram!")
 
 if __name__ == '__main__':
     executor.start_polling(dp)

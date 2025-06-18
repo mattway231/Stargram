@@ -1,30 +1,33 @@
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler
 from flask import Flask, request
 import os
 
-app = Flask(__name__)
+# Инициализация Flask
+flask_app = Flask(__name__)
+
+# Инициализация бота
 bot_app = Application.builder().token(os.getenv("TELEGRAM_TOKEN")).build()
 
-# Обработчик /start
+# Обработчик команды /start
 async def start(update, context):
     await update.message.reply_text("👋 Бот Stargram активирован!")
 
-# API-эндпоинт для сайта
-@app.route('/api/group_data', methods=['GET'])
-def get_group_data():
-    # Здесь будет логика получения данных из группы
-    return {"members": 150, "messages_today": 42}
+# Регистрация обработчиков
+bot_app.add_handler(CommandHandler("start", start))
 
-# Вебхук для приёма данных от Telegram
-@app.route('/webhook', methods=['POST'])
+# Вебхук
+@flask_app.route('/webhook', methods=['POST'])
 async def webhook():
-    update = Update.de_json(await request.get_json(), bot_app.bot)
+    from telegram import Update
+    json_data = await request.get_json()
+    update = Update.de_json(json_data, bot_app.bot)
     await bot_app.process_update(update)
     return '', 200
 
+# Главная страница для проверки работы
+@flask_app.route('/')
+def home():
+    return "Stargram Bot is running!"
+
 if __name__ == '__main__':
-    # Регистрация обработчиков
-    bot_app.add_handler(CommandHandler("start", start))
-    
-    # Запуск Flask и бота
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    flask_app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

@@ -5,7 +5,6 @@ import os
 bot = Bot(token=os.getenv("TELEGRAM_TOKEN"))
 dp = Dispatcher(bot)
 
-# Ответ на /start (строго по ТЗ)
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     await message.answer("👋 Бот Stargram активирован! Он работает только для передачи данных сайту.")

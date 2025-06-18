@@ -1,13 +1,13 @@
-from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from telegram.ext import Application, CommandHandler
 import os
 
-bot = Bot(token=os.getenv("TELEGRAM_TOKEN"))
-dp = Dispatcher(bot)
+async def start(update, context):
+    await update.message.reply_text("👋 Бот Stargram активирован! Он работает только для передачи данных сайту.")
 
-@dp.message_handler(commands=['start'])
-async def start(message: types.Message):
-    await message.answer("👋 Бот Stargram активирован! Он работает только для передачи данных сайту.")
+def main():
+    app = Application.builder().token(os.getenv("TELEGRAM_TOKEN")).build()
+    app.add_handler(CommandHandler("start", start))
+    app.run_polling()
 
 if __name__ == '__main__':
-    executor.start_polling(dp)
+    main()

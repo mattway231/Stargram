@@ -24,7 +24,7 @@ async def webhook():
     await bot_app.process_update(update)
     return '', 200
 
-# Главная страница для проверки работы
+# Проверка работы
 @flask_app.route('/')
 def home():
     return "Stargram Bot is running!"

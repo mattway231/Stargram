@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 # Токен бота (используй переменную окружения!)
-TOKEN = os.getenv("7959499371:AAEV-_I36hL1mtdzSc5T21_2WSeMQQkkhBc")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 async def start(update: Update, context):
     await update.message.reply_text("Привет! Я бот Stargram. Используй /help для списка команд.")

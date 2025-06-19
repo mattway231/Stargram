@@ -2,7 +2,7 @@ import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.getenv("7959499371:AAEV-_I36hL1mtdzSc5T21_2WSeMQQkkhBc")
 
 async def start(update: Update, context):
     # Кнопка для перехода в веб-приложение

@@ -65,7 +65,7 @@ async def login(update: Update, context):
     keyboard = InlineKeyboardMarkup([[
         InlineKeyboardButton(
             "Открыть Stargram",
-            web_app={"url": "https://ваш-ник.github.io/Stargram/"}
+            web_app={"url": "https://mattway231.github.io/Stargram/"}
         )
     ]])
     await update.message.reply_text(

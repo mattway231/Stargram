@@ -4,16 +4,27 @@ import psycopg2
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-# Настройка логов
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Загрузка конфигов
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 DB_URL = os.getenv("DATABASE_URL")
 
-if not TOKEN:
-    raise ValueError("Токен бота не найден! Проверь переменную TELEGRAM_BOT_TOKEN в Render.")
+def init_db():
+    try:
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        user_id BIGINT PRIMARY KEY,
+                        username TEXT,
+                        nova INTEGER DEFAULT 100,
+                        tix INTEGER DEFAULT 50
+                    );
+                """)
+        logger.info("✅ Таблица users создана или уже существует")
+    except Exception as e:
+        logger.error(f"❌ Ошибка при создании таблицы: {e}")
 
 async def start(update: Update, context):
     try:
@@ -46,13 +57,11 @@ async def balance(update: Update, context):
         await update.message.reply_text("❌ Не удалось проверить баланс.")
 
 def main():
-    try:
-        app = Application.builder().token(TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        app.add_handler(MessageHandler(filters.Regex(r'!баланс'), balance))
-        app.run_polling()
-    except Exception as e:
-        logger.critical(f"Бот упал: {e}")
+    init_db()  # Проверяем и создаем таблицу при запуске
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.Regex(r'!баланс'), balance))
+    app.run_polling()
 
 if __name__ == "__main__":
     main()

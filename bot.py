@@ -1,10 +1,14 @@
 import os
 import logging
 import psycopg2
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+# Настройка логов
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -18,8 +22,8 @@ def init_db():
                     CREATE TABLE IF NOT EXISTS users (
                         user_id BIGINT PRIMARY KEY,
                         username TEXT,
-                        nova INTEGER DEFAULT 100,
-                        tix INTEGER DEFAULT 50
+                        nova INTEGER DEFAULT 0,
+                        tix INTEGER DEFAULT 0
                     );
                 """)
         logger.info("✅ Таблица users создана или уже существует")
@@ -56,11 +60,28 @@ async def balance(update: Update, context):
         logger.error(f"Ошибка в !баланс: {e}")
         await update.message.reply_text("❌ Не удалось проверить баланс.")
 
+async def login(update: Update, context):
+    """Отправляет кнопку для входа в WebApp"""
+    keyboard = InlineKeyboardMarkup([[
+        InlineKeyboardButton(
+            "Открыть Stargram",
+            web_app={"url": "https://ваш-ник.github.io/Stargram/"}
+        )
+    ]])
+    await update.message.reply_text(
+        "Нажми кнопку ниже, чтобы войти в приложение:",
+        reply_markup=keyboard
+    )
+
 def main():
-    init_db()  # Проверяем и создаем таблицу при запуске
+    init_db()  # Создаем таблицу при запуске
     app = Application.builder().token(TOKEN).build()
+    
+    # Регистрируем обработчики команд
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("login", login))
     app.add_handler(MessageHandler(filters.Regex(r'!баланс'), balance))
+    
     app.run_polling()
 
 if __name__ == "__main__":

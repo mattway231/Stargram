@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS users (
+    user_id BIGINT PRIMARY KEY,
+    username TEXT,
+    nova INTEGER DEFAULT 100,
+    tix INTEGER DEFAULT 50
+);

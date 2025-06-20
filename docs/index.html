@@ -4,115 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargram</title>
-    
-    <!-- Шрифт Benzin (локальный) -->
     <style>
         @font-face {
             font-family: 'Benzin';
-            src: url('https://fonts.cdnfonts.com/css/benzin') format('woff2');
-            font-display: swap;
+            src: url('fonts/benzin-regular.woff2?v=2') format('woff2');
+            font-weight: normal;
         }
-    </style>
-    
-    <!-- Стили -->
-    <style>
+        @font-face {
+            font-family: 'Benzin';
+            src: url('fonts/benzin-bold.woff2?v=2') format('woff2');
+            font-weight: bold;
+        }
+        
         :root {
             --dark-bg: #121212;
-            --glass-orange: rgba(255, 107, 53, 0.2);
-            --glass-purple: rgba(142, 45, 226, 0.2);
+            --glass-orange: rgba(255, 107, 53, 0.15);
+            --glass-purple: rgba(142, 45, 226, 0.15);
             --text-light: rgba(255, 255, 255, 0.9);
         }
         
         body {
-            background: url('https://i.pinimg.com/236x/99/54/09/9954098be7ed369661670574173c8ae5.jpg') no-repeat center center fixed;
+            background: url('https://ссылка-на-твое-изображение.jpg') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Benzin', sans-serif;
             color: var(--text-light);
             margin: 0;
-            padding: 20px;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-weight: bold; /* Использует Benzin Bold */
         }
         
         .glass-card {
             background: linear-gradient(135deg, var(--glass-orange), var(--glass-purple));
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #FF6B35, #8E2DE2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .tg-login-btn {
-            background: linear-gradient(90deg, #FF6B35, #8E2DE2);
-            border: none;
-            border-radius: 50px;
-            padding: 12px 24px;
-            color: white;
-            font-family: 'Benzin', sans-serif;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .tg-login-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        #userData {
-            display: none;
-            margin-top: 20px;
+            padding: 25px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
     <div class="glass-card">
         <h1>STARGRAM</h1>
-        <p>Войдите через Telegram, чтобы получить доступ к $NOVA и нейросетям!</p>
-        
-        <!-- Кнопка для входа -->
+        <p>Войдите через Telegram, чтобы начать:</p>
         <button class="tg-login-btn" id="tgLogin">Войти через Telegram</button>
-        
-        <!-- Блок с данными пользователя -->
-        <div id="userData">
-            <p>Добро пожаловать, <span id="userName"></span>!</p>
-            <p>ID: <span id="userId"></span></p>
-        </div>
     </div>
 
-    <!-- Скрипт для Telegram WebApp -->
     <script>
-        // Проверяем, открыто ли в Telegram WebApp
-        if (window.Telegram && Telegram.WebApp.initData) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            document.getElementById('userData').style.display = 'block';
-            document.getElementById('userName').textContent = user.first_name;
-            document.getElementById('userId').textContent = user.id;
-            document.getElementById('tgLogin').style.display = 'none';
-            
-            // Раскрываем WebApp на весь экран
+        document.getElementById('tgLogin').addEventListener('click', () => {
             Telegram.WebApp.expand();
-        } else {
-            // Если открыто в браузере, показываем кнопку-заглушку
-            document.getElementById('tgLogin').addEventListener('click', () => {
-                alert("Откройте бота в Telegram и используйте команду /login!");
-            });
-        }
+        });
     </script>
 </body>
 </html>

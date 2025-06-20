@@ -4,17 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargram</title>
-    <link href="https://fonts.cdnfonts.com/css/benzin" rel="stylesheet">
+    
+    <!-- Шрифт Benzin (локальный) -->
+    <style>
+        @font-face {
+            font-family: 'Benzin';
+            src: url('https://fonts.cdnfonts.com/css/benzin') format('woff2');
+            font-display: swap;
+        }
+    </style>
+    
+    <!-- Стили -->
     <style>
         :root {
             --dark-bg: #121212;
-            --glass-orange: rgba(255, 107, 53, 0.15);
-            --glass-purple: rgba(142, 45, 226, 0.15);
+            --glass-orange: rgba(255, 107, 53, 0.2);
+            --glass-purple: rgba(142, 45, 226, 0.2);
             --text-light: rgba(255, 255, 255, 0.9);
         }
         
         body {
-            background: var(--dark-bg);
+            background: url('https://i.pinimg.com/236x/99/54/09/9954098be7ed369661670574173c8ae5.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: 'Benzin', sans-serif;
             color: var(--text-light);
             margin: 0;
@@ -27,15 +38,23 @@
         
         .glass-card {
             background: linear-gradient(135deg, var(--glass-orange), var(--glass-purple));
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             padding: 30px;
             max-width: 400px;
             width: 100%;
             text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #FF6B35, #8E2DE2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .tg-login-btn {
@@ -55,12 +74,9 @@
             transform: scale(1.05);
         }
         
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #FF6B35, #8E2DE2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        #userData {
+            display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -69,16 +85,17 @@
         <h1>STARGRAM</h1>
         <p>Войдите через Telegram, чтобы получить доступ к $NOVA и нейросетям!</p>
         
-        <!-- Кнопка для входа через WebApp -->
+        <!-- Кнопка для входа -->
         <button class="tg-login-btn" id="tgLogin">Войти через Telegram</button>
         
-        <!-- Блок для отображения данных пользователя -->
-        <div id="userData" style="display: none; margin-top: 20px;">
+        <!-- Блок с данными пользователя -->
+        <div id="userData">
             <p>Добро пожаловать, <span id="userName"></span>!</p>
             <p>ID: <span id="userId"></span></p>
         </div>
     </div>
 
+    <!-- Скрипт для Telegram WebApp -->
     <script>
         // Проверяем, открыто ли в Telegram WebApp
         if (window.Telegram && Telegram.WebApp.initData) {

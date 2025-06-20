@@ -60,18 +60,6 @@ async def balance(update: Update, context):
         logger.error(f"Ошибка в !баланс: {e}")
         await update.message.reply_text("❌ Не удалось проверить баланс.")
 
-async def login(update: Update, context):
-    """Отправляет кнопку для входа в WebApp"""
-    keyboard = InlineKeyboardMarkup([[
-        InlineKeyboardButton(
-            "Открыть Stargram",
-            web_app={"url": "https://mattway231.github.io/Stargram/"}
-        )
-    ]])
-    await update.message.reply_text(
-        "Нажми кнопку ниже, чтобы войти в приложение:",
-        reply_markup=keyboard
-    )
 
 def main():
     init_db()  # Создаем таблицу при запуске
@@ -84,5 +72,49 @@ def main():
     
     app.run_polling()
 
+from telegram import Update, WebAppInfo
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+import psycopg2
+import os
+from flask import Flask, request, jsonify
+
+# Flask-сервер для проверки участников
+app_flask = Flask(__name__)
+
+@app_flask.route('/check_user', methods=['POST'])
+def check_user():
+    data = request.get_json()
+    user_id = data['user_id']
+    
+    # Проверка в базе (или через Telegram API)
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM users WHERE user_id = %s", (user_id,))
+            if cur.fetchone():
+                return jsonify({"is_member": True})
+    
+    return jsonify({"is_member": False})
+
+async def send_webapp(update: Update, context: CallbackContext):
+    await update.message.reply_text(
+        "Открыть Stargram:",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton(
+                "🌟 Открыть",
+                web_app=WebAppInfo(url="https://mattway231.github.io/Stargram/")
+            )
+        ]])
+    )
+
+def main():
+    # Запуск Flask в отдельном потоке
+    from threading import Thread
+    Thread(target=app_flask.run, kwargs={'port': 5000}).start()
+    
+    # Инициализация бота
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", send_webapp))
+    app.run_polling()
+    
 if __name__ == "__main__":
     main()

@@ -2,22 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargram</title>
     <style>
-        /* Liquid Glass Effect */
-        :root {
-            --bg-color: #0a0a12;
-            --text-gradient: linear-gradient(90deg, #ffb347, #ff8a3d);
-            --glass-color: rgba(30, 30, 40, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-highlight: rgba(255, 255, 255, 0.05);
-            --nova-color: #4caf50;
-            --tix-color: #ff9800;
-            --purple-gradient: linear-gradient(135deg, rgba(70, 30, 120, 0.6), rgba(40, 20, 80, 0.8));
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
         @font-face {
             font-family: 'Benzin';
             src: url('fonts/Benzin-Bold.woff2') format('woff2'),
@@ -26,602 +13,478 @@
             font-style: normal;
         }
 
+        :root {
+            --bg-dark: #121212;
+            --bg-darker: #0a0a0a;
+            --bg-glass: rgba(30, 30, 30, 0.7);
+            --primary-orange: #FF6B35;
+            --primary-purple: #9B5DE5;
+            --accent: #F15BB5;
+            --text-primary: #F8F9FA;
+            --text-secondary: rgba(248, 249, 250, 0.7);
+            --success: #4BB543;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --blur: 10px;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
             font-family: 'Benzin', sans-serif;
         }
 
         body {
-            background: var(--bg-color);
-            color: white;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             min-height: 100vh;
             padding-bottom: 80px;
             position: relative;
-            overflow-x: hidden;
         }
 
-        /* Liquid Glass Effect */
+        /* Glassmorphism elements */
         .glass {
-            background: var(--glass-color);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
         }
 
-        .glass::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                var(--glass-highlight),
-                transparent
-            );
-            transform: rotate(30deg);
-            opacity: 0.3;
-            pointer-events: none;
+        /* Neomorphism elements */
+        .neo {
+            border-radius: var(--border-radius);
+            background: var(--bg-dark);
+            box-shadow:  8px 8px 16px #0a0a0a,
+                        -8px -8px 16px #1a1a1a;
         }
 
-        .gradient-text {
-            background: var(--text-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        /* Combined elements */
+        .card {
+            composes: glass, neo;
+            transition: var(--transition);
         }
 
-        .container {
-            max-width: 100%;
-            width: 100%;
-            padding: 15px;
-            margin: 0 auto;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Header */
-        .profile-header {
+        /* Header styles */
+        header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin-bottom: 20px;
-        }
-
-        .profile-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .profile-name {
-            margin-left: 12px;
-            font-size: 18px;
-            font-weight: 500;
-            background: var(--text-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* AI Block */
-        .ai-block {
             padding: 16px;
-            margin-bottom: 16px;
-            background: var(--purple-gradient);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .ai-title {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .ai-input-container {
+        .user-info {
             display: flex;
             align-items: center;
+            gap: 12px;
         }
 
-        .ai-input {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 24px;
-            border: none;
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .ai-input:focus {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .ai-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .ai-send-btn {
-            width: 44px;
-            height: 44px;
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--text-gradient);
-            border: none;
-            margin-left: 8px;
+            background: linear-gradient(145deg, var(--primary-orange), var(--primary-purple));
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(255, 140, 50, 0.3);
-        }
-
-        .ai-send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .ai-send-icon {
-            font-size: 20px;
             font-weight: bold;
             color: white;
         }
 
-        /* Report Block */
-        .report-block {
+        .username {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Main content */
+        .container {
             padding: 16px;
-            margin-bottom: 16px;
+            max-width: 100%;
+            margin: 0 auto;
         }
 
-        .report-title {
-            font-size: 16px;
-            margin-bottom: 6px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .report-desc {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+        .section-title {
+            font-size: 18px;
             margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .report-input-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .report-input {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 24px;
-            border: none;
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .report-submit {
-            padding: 12px 16px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, #ff5e62, #ff9966);
-            color: white;
-            border: none;
-            margin-left: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 90px;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .report-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 100, 100, 0.3);
-        }
-
-        .report-note {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            text-align: center;
-        }
-
-        /* Balance Block */
-        .balance-label {
-            font-size: 16px;
-            margin: 16px 0 8px 8px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .balance-block {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        /* GPT-4o section */
+        .gpt-section {
+            margin-bottom: 20px;
+        }
+
+        .gpt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .gpt-title {
+            font-size: 16px;
+            color: var(--primary-orange);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Report section */
+        .report-section {
+            margin-bottom: 20px;
+        }
+
+        .report-header {
+            font-size: 16px;
+            color: var(--primary-purple);
+            margin-bottom: 8px;
+        }
+
+        .report-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .reward-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .reward-amount {
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .cost-info {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        /* Balance section */
+        .balance-section {
+            margin-bottom: 20px;
+        }
+
+        .balance-card {
             padding: 16px;
-            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
         }
 
         .balance-item {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 0 6px;
-            transition: all 0.3s;
-        }
-
-        .balance-item:active {
-            transform: scale(0.98);
-        }
-
-        .nova-balance {
-            background: linear-gradient(135deg, rgba(30, 120, 50, 0.6), rgba(20, 80, 40, 0.8));
-        }
-
-        .tix-balance {
-            background: linear-gradient(135deg, rgba(200, 100, 0, 0.6), rgba(160, 80, 0, 0.8));
-        }
-
-        .balance-amount {
-            font-size: 20px;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 0 8px;
-        }
-
-        .action-btn {
-            width: 30%;
-            padding: 16px 0;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(50, 50, 60, 0.6), rgba(30, 30, 40, 0.8));
-            border: none;
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
-            overflow: hidden;
         }
 
-        .action-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0),
-                rgba(255, 255, 255, 0.1),
-                rgba(255, 255, 255, 0)
-            );
-            transform: rotate(30deg);
-            transition: all 0.3s;
-            opacity: 0;
+        .currency {
+            font-size: 14px;
+            margin-bottom: 4px;
         }
 
-        .action-btn:hover::after {
-            opacity: 1;
-            animation: shine 1.5s infinite;
+        .amount {
+            font-size: 18px;
+            font-weight: bold;
         }
 
-        @keyframes shine {
-            0% { transform: rotate(30deg) translate(-10%, -10%); }
-            100% { transform: rotate(30deg) translate(10%, 10%); }
+        .nova {
+            color: var(--success);
         }
 
-        .action-btn:active {
-            transform: scale(0.96);
+        .tix {
+            color: var(--warning);
+        }
+
+        /* Action buttons */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .action-icon {
             font-size: 24px;
-            margin-bottom: 6px;
-            background: var(--text-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
         }
 
-        /* Members List */
-        .members-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 16px 8px 8px;
+        .action-label {
+            font-size: 12px;
         }
 
-        .members-title {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.9);
+        /* Members section */
+        .members-section {
+            margin-bottom: 20px;
         }
 
         .sort-btn {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
             font-size: 14px;
-            cursor: pointer;
             display: flex;
             align-items: center;
-            padding: 4px 8px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .sort-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sort-icon {
-            margin-left: 4px;
-            font-size: 12px;
+            gap: 4px;
+            cursor: pointer;
         }
 
         .members-list {
-            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .member-card {
             display: flex;
             align-items: center;
             padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .member-card:active {
-            transform: scale(0.98);
+            gap: 12px;
         }
 
         .member-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            object-fit: cover;
-            margin-right: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(145deg, var(--primary-purple), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
         }
 
         .member-info {
             flex: 1;
-            min-width: 0;
         }
 
         .member-name {
             font-size: 14px;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .member-username {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: var(--text-secondary);
         }
 
         .member-balance {
             display: flex;
-            margin-left: 8px;
+            gap: 8px;
         }
 
         .balance-badge {
             padding: 4px 8px;
-            border-radius: 6px;
+            border-radius: var(--border-radius-sm);
             font-size: 12px;
-            font-weight: 500;
-            margin-left: 6px;
-            min-width: 50px;
-            text-align: center;
         }
 
         .nova-badge {
-            background: rgba(50, 150, 50, 0.2);
-            color: #4caf50;
+            background: rgba(75, 181, 67, 0.2);
+            color: var(--success);
         }
 
         .tix-badge {
-            background: rgba(200, 120, 0, 0.2);
-            color: #ff9800;
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
         }
 
-        /* Bottom Menu */
-        .bottom-menu {
+        /* Bottom navigation */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 10px 16px;
-            display: flex;
-            justify-content: space-between;
-            background: rgba(20, 20, 30, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
+            padding: 8px 0;
         }
 
-        .menu-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            cursor: pointer;
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 4px 8px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            min-width: 60px;
+            gap: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 10px;
         }
 
-        .menu-btn.active {
-            color: #ff8a3d;
-            background: rgba(255, 140, 50, 0.1);
+        .nav-item.active {
+            color: var(--primary-orange);
         }
 
-        .menu-icon {
+        .nav-icon {
             font-size: 20px;
-            margin-bottom: 4px;
         }
 
-        /* Modals */
+        /* Modal styles */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .modal-overlay.show {
             display: flex;
-            opacity: 1;
+            justify-content: center;
+            align-items: flex-end;
         }
 
         .modal-content {
             width: 100%;
-            max-width: 400px;
             max-height: 80vh;
-            overflow-y: auto;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
             padding: 20px;
-            border-radius: 16px;
-            transform: translateY(20px);
-            transition: transform 0.3s;
+            overflow-y: auto;
         }
 
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-title {
-            font-size: 18px;
+        .modal-header {
+            display: flex;
+            justify-content: flex-end;
             margin-bottom: 16px;
-            color: white;
-            text-align: center;
         }
 
-        .close-modal {
-            position: absolute;
-            top: 16px;
-            right: 16px;
+        .close-btn {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-primary);
             font-size: 24px;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s;
         }
 
-        .close-modal:hover {
-            background: rgba(255, 255, 255, 0.1);
+        /* Gift modal */
+        .currency-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .currency-option {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .currency-option.active {
+            background: var(--primary-orange);
             color: white;
         }
 
-        /* Shop Styles */
-        .shop-tabs {
-            display: flex;
-            margin-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .shop-tab {
-            flex: 1;
+        /* Exchange modal */
+        .exchange-rate {
             padding: 12px;
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-            cursor: pointer;
-            position: relative;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 16px;
         }
 
-        .shop-tab.active {
-            color: #ff8a3d;
-        }
-
-        .shop-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #ff8a3d;
-        }
-
+        /* Shop styles */
         .shop-item {
             display: flex;
             align-items: center;
             padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 12px;
+            margin-bottom: 12px;
+            gap: 12px;
         }
 
-        .shop-item.featured {
-            border: 1px solid #ff8a3d;
-            background: linear-gradient(135deg, rgba(255, 100, 50, 0.1), rgba(255, 140, 50, 0.05));
-        }
-
-        .shop-item-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        .shop-item-image {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--border-radius-sm);
             background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 20px;
         }
 
         .shop-item-info {
@@ -629,884 +492,523 @@
         }
 
         .shop-item-name {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 4px;
         }
 
-        .shop-item-desc {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
         .shop-item-price {
-            padding: 6px 12px;
-            border-radius: 6px;
-            background: rgba(255, 140, 50, 0.2);
-            color: #ff8a3d;
-            font-size: 14px;
-            font-weight: 500;
-            margin-left: 8px;
-            white-space: nowrap;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-orange);
         }
 
-        .shop-item-buy {
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #ff5e62, #ff9966);
-            border: none;
+        .limited-tag {
+            background: var(--danger);
             color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin-left: 8px;
         }
 
-        .shop-item-buy:active {
-            transform: scale(0.95);
+        /* AI Chat styles */
+        .chat-container {
+            height: calc(100vh - 180px);
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+        .chat-title {
+            font-size: 18px;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
         }
 
-        .pulse {
-            animation: pulse 0.3s ease;
+        .message {
+            margin-bottom: 16px;
+            max-width: 80%;
         }
 
-        /* Responsive */
-        @media (max-width: 400px) {
-            .balance-amount {
-                font-size: 18px;
-            }
-            .action-btn {
-                padding: 12px 0;
-            }
-            .action-icon {
-                font-size: 20px;
-            }
-            .report-submit {
-                min-width: 80px;
-                padding: 12px 12px;
-            }
+        .user-message {
+            margin-left: auto;
+            background: var(--primary-purple);
+            color: white;
+            padding: 12px;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .ai-message {
+            margin-right: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 12px 12px 12px 0;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Starmap styles */
+        .map-container {
+            height: calc(100vh - 120px);
+            position: relative;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .map-btn {
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 8px 12px;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+
+        /* Utility classes */
+        .text-center {
+            text-align: center;
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+        .py-2 {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+        .px-3 {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        .w-100 {
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Profile Header -->
-        <div class="profile-header glass fade-in">
-            <img src="" alt="Аватар" class="profile-avatar" id="user-avatar">
-            <div class="profile-name" id="username">Загрузка...</div>
-        </div>
+    <!-- Main App Container -->
+    <div id="app">
+        <!-- Header -->
+        <header class="glass">
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="username" id="username">Username</div>
+            </div>
+        </header>
 
-        <!-- AI Block -->
-        <div class="ai-block glass fade-in">
-            <div class="ai-title">Нейросеть GPT-4o</div>
-            <div class="ai-input-container">
-                <input type="text" class="ai-input" placeholder="Написать нейросети" id="ai-input">
-                <button class="ai-send-btn" disabled id="ai-send-btn">
-                    <span class="ai-send-icon">↑</span>
+        <!-- Main Content -->
+        <div class="container">
+            <!-- GPT-4 Section -->
+            <section class="gpt-section card">
+                <div class="gpt-header">
+                    <div class="gpt-title">GPT-4o</div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder="Написать нейросети">
+                    <button class="btn btn-primary" disabled id="send-gpt-btn">
+                        <i class="nav-icon">➤</i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Report Section -->
+            <section class="report-section card">
+                <div class="report-header">Пожаловаться на игрока</div>
+                <div class="report-description">
+                    Отправь ссылку на сообщение, в котором по твоему мнению есть нарушение, и ИИ его проверит на наличие нарушений и даст тебе 6000❇️
+                </div>
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder="Ссылка на сообщение">
+                    <button class="btn btn-primary" id="report-btn">5000❇️</button>
+                </div>
+                <div class="cost-info">
+                    Жалоба стоит 5000❇️, если нейросеть посчитает это сообщение действительно нарушением правил, тебе вернут 120% (6000❇️)
+                </div>
+                <div class="report-result" id="report-result" style="display: none;"></div>
+            </section>
+
+            <!-- Balance Section -->
+            <section class="balance-section">
+                <div class="section-title">
+                    <span>Баланс</span>
+                </div>
+                <div class="balance-card card">
+                    <div class="balance-item">
+                        <span class="currency">$NOVA</span>
+                        <span class="amount nova" id="nova-balance">0❇️</span>
+                    </div>
+                    <div class="balance-item">
+                        <span class="currency">$TIX</span>
+                        <span class="amount tix" id="tix-balance">0✴️</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="actions">
+                <button class="action-btn" id="exchange-btn">
+                    <i class="action-icon">⇄</i>
+                    <span class="action-label">Обменять</span>
                 </button>
-            </div>
-        </div>
+                <button class="action-btn" id="buy-btn">
+                    <i class="action-icon">🛒</i>
+                    <span class="action-label">Купить</span>
+                </button>
+                <button class="action-btn" id="gift-btn">
+                    <i class="action-icon">🎁</i>
+                    <span class="action-label">Подарить</span>
+                </button>
+            </section>
 
-        <!-- Report Block -->
-        <div class="report-block glass fade-in">
-            <div class="report-title">Пожаловаться на игрока</div>
-            <div class="report-desc">Отправь ссылку на сообщение с нарушением. ИИ проверит его и даст тебе 6000❇️</div>
-            <div class="report-input-container">
-                <input type="text" class="report-input" placeholder="Ссылка на сообщение" id="report-input">
-                <button class="report-submit" id="report-submit">5000❇️</button>
-            </div>
-            <div class="report-note">Жалоба стоит 5000❇️. Если нарушение подтвердится, получишь 120% (6000❇️)</div>
-        </div>
-
-        <!-- Balance Block -->
-        <div class="balance-label">Баланс</div>
-        <div class="balance-block glass fade-in">
-            <div class="balance-item nova-balance" id="nova-balance-btn">
-                <div>$NOVA</div>
-                <div class="balance-amount" id="nova-balance">0❇️</div>
-            </div>
-            <div class="balance-item tix-balance" id="tix-balance-btn">
-                <div>$TIX</div>
-                <div class="balance-amount" id="tix-balance">0✴️</div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons fade-in">
-            <button class="action-btn pulse" id="exchange-btn">
-                <span class="action-icon">⇄</span>
-                Обменять
-            </button>
-            <button class="action-btn pulse" id="buy-btn">
-                <span class="action-icon">🛒</span>
-                Купить
-            </button>
-            <button class="action-btn pulse" id="gift-btn">
-                <span class="action-icon">🎁</span>
-                Подарить
-            </button>
-        </div>
-
-        <!-- Members List -->
-        <div class="members-header">
-            <div class="members-title">Участники</div>
-            <button class="sort-btn" id="sort-btn">
-                Сортировать
-                <span class="sort-icon">▼</span>
-            </button>
-        </div>
-        <div class="members-list" id="members-list">
-            <!-- Members will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Bottom Menu -->
-    <div class="bottom-menu glass">
-        <button class="menu-btn active" data-page="main">
-            <span class="menu-icon">🏠</span>
-            Главная
-        </button>
-        <button class="menu-btn" data-page="ai">
-            <span class="menu-icon">🤖</span>
-            Нейросети
-        </button>
-        <button class="menu-btn" data-page="map">
-            <span class="menu-icon">🗺️</span>
-            StarMap
-        </button>
-        <button class="menu-btn" data-page="shop">
-            <span class="menu-icon">🛍️</span>
-            Магазин
-        </button>
-    </div>
-
-    <!-- Gift Modal -->
-    <div class="modal-overlay" id="gift-modal">
-        <div class="modal-content glass">
-            <button class="close-modal" id="close-gift-modal">×</button>
-            <div class="modal-title">Выберите участника</div>
-            <input type="text" placeholder="Поиск..." class="ai-input" id="member-search" style="width: 100%; margin-bottom: 16px;">
-            <div id="members-modal-list">
-                <!-- Members for gifting -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Send Gift Modal -->
-    <div class="modal-overlay" id="send-gift-modal">
-        <div class="modal-content glass">
-            <button class="close-modal" id="close-send-gift-modal">×</button>
-            <div class="modal-title">Отправить подарок</div>
-            
-            <div class="currency-selector">
-                <div class="currency-option nova-balance active" id="select-nova">
-                    <div>$NOVA</div>
-                    <div class="balance-amount" id="modal-nova-balance">0❇️</div>
+            <!-- Members Section -->
+            <section class="members-section">
+                <div class="section-title">
+                    <span>Участники</span>
+                    <button class="sort-btn" id="sort-btn">
+                        <i class="nav-icon">⇅</i> Сортировать
+                    </button>
                 </div>
-                <div class="currency-option tix-balance" id="select-tix">
-                    <div>$TIX</div>
-                    <div class="balance-amount" id="modal-tix-balance">0✴️</div>
+                <div class="members-list" id="members-list">
+                    <!-- Members will be populated by JavaScript -->
                 </div>
-            </div>
-            
-            <div class="gift-amount-container">
-                <input type="number" placeholder="Сумма" class="gift-amount-input" id="gift-amount">
-                <div class="gift-currency-display" id="gift-currency">❇️</div>
-            </div>
-            
-            <button class="modal-btn" id="send-gift-btn">Отправить</button>
+            </section>
         </div>
-    </div>
 
-    <!-- Exchange Modal -->
-    <div class="modal-overlay" id="exchange-modal">
-        <div class="modal-content glass">
-            <button class="close-modal" id="close-exchange-modal">×</button>
-            <div class="modal-title">Обмен валют</div>
-            
-            <div class="currency-selector">
-                <div class="currency-option nova-balance active" id="exchange-from-nova">
-                    <div>У меня</div>
-                    <div class="balance-amount">$NOVA</div>
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-page="home">
+                <i class="nav-icon">🏠</i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="nav-item" data-page="ai">
+                <i class="nav-icon">🤖</i>
+                <span>Нейросети</span>
+            </a>
+            <a href="#" class="nav-item" data-page="starmap">
+                <i class="nav-icon">🗺️</i>
+                <span>StarMap</span>
+            </a>
+            <a href="#" class="nav-item" data-page="shop">
+                <i class="nav-icon">🛍️</i>
+                <span>Магазин</span>
+            </a>
+        </nav>
+
+        <!-- Modals -->
+        <!-- Gift Modal -->
+        <div class="modal-overlay" id="gift-modal" style="display: none;">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <button class="close-btn" id="close-gift-modal">×</button>
                 </div>
-                <div class="currency-option tix-balance" id="exchange-from-tix">
-                    <div>У меня</div>
-                    <div class="balance-amount">$TIX</div>
+                <div class="currency-selector">
+                    <div class="currency-option active" data-currency="nova">
+                        <div>$NOVA</div>
+                        <div id="gift-nova-balance">0❇️</div>
+                    </div>
+                    <div class="currency-option" data-currency="tix">
+                        <div>$TIX</div>
+                        <div id="gift-tix-balance">0✴️</div>
+                    </div>
+                </div>
+                <input type="text" class="input-field w-100 mb-2" placeholder="Введите сумму">
+                <button class="btn btn-primary w-100" id="send-gift-btn">Отправить</button>
+                <div class="gift-result" id="gift-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Exchange Modal -->
+        <div class="modal-overlay" id="exchange-modal" style="display: none;">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <button class="close-btn" id="close-exchange-modal">×</button>
+                </div>
+                <div class="currency-selector">
+                    <div class="currency-option active" data-currency="nova">
+                        <div>$NOVA</div>
+                        <div id="exchange-nova-balance">0❇️</div>
+                    </div>
+                    <div class="currency-option" data-currency="tix">
+                        <div>$TIX</div>
+                        <div id="exchange-tix-balance">0✴️</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder="Введите сумму">
+                    <span class="btn btn-secondary">❇️</span>
+                </div>
+                <div class="exchange-rate">
+                    <div>Будет конвертировано в</div>
+                    <div id="exchange-result">0✴️</div>
+                </div>
+                <button class="btn btn-primary w-100" id="confirm-exchange-btn">Перевести</button>
+            </div>
+        </div>
+
+        <!-- Shop Modal -->
+        <div class="page" id="shop-page" style="display: none;">
+            <div class="container">
+                <div class="section-title">
+                    <span>Магазин</span>
+                </div>
+                <div class="shop-items" id="shop-items">
+                    <!-- Shop items will be populated by JavaScript -->
                 </div>
             </div>
-            
-            <div class="gift-amount-container" style="margin-bottom: 8px;">
-                <input type="number" placeholder="Сумма" class="gift-amount-input" id="exchange-amount">
-                <div class="gift-currency-display" id="exchange-from-currency">❇️</div>
-            </div>
-            
-            <div style="text-align: center; margin: 12px 0; font-size: 24px;">↓</div>
-            
-            <div class="gift-amount-container" style="margin-bottom: 16px;">
-                <input type="text" readonly class="gift-amount-input" id="exchange-result">
-                <div class="gift-currency-display" id="exchange-to-currency">✴️</div>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 16px; font-size: 12px; color: rgba(255,255,255,0.6);">
-                Курс: 10000❇️ = 1✴️
-            </div>
-            
-            <button class="modal-btn" id="exchange-submit-btn">Обменять</button>
         </div>
-    </div>
 
-    <!-- Shop Modal -->
-    <div class="modal-overlay" id="shop-modal">
-        <div class="modal-content glass">
-            <button class="close-modal" id="close-shop-modal">×</button>
-            <div class="modal-title">Магазин</div>
-            
-            <div class="shop-tabs">
-                <button class="shop-tab active" data-tab="currency">Валюта</button>
-                <button class="shop-tab" data-tab="privileges">Привилегии</button>
+        <!-- AI Page -->
+        <div class="page" id="ai-page" style="display: none;">
+            <div class="chat-container">
+                <div class="chat-header glass">
+                    <button class="btn btn-secondary" id="ai-back-btn">←</button>
+                    <div class="chat-title">GPT-4o</div>
+                    <button class="btn btn-secondary">+</button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be populated by JavaScript -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" class="input-field" placeholder="Написать сообщение...">
+                    <button class="btn btn-primary">➤</button>
+                </div>
             </div>
-            
-            <div class="shop-content" id="currency-shop">
-                <!-- Currency items will be loaded here -->
-            </div>
-            
-            <div class="shop-content" id="privileges-shop" style="display:none;">
-                <!-- Privilege items will be loaded here -->
+        </div>
+
+        <!-- Starmap Page -->
+        <div class="page" id="starmap-page" style="display: none;">
+            <div class="map-container" id="map-container">
+                <div class="text-center py-2 px-3 glass" style="margin: 16px;">
+                    Разрешите доступ к геопозиции, чтобы видеть участников на карте
+                </div>
+                <div class="map-controls">
+                    <button class="map-btn">
+                        <i class="nav-icon">👣</i>
+                        <span>Шаги</span>
+                    </button>
+                    <button class="map-btn">
+                        <i class="nav-icon">📍</i>
+                        <span>Точки</span>
+                    </button>
+                    <button class="map-btn">
+                        <i class="nav-icon">👤</i>
+                        <span>Профиль</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Telegram WebApp integration
-        const tg = window.Telegram.WebApp;
-        const TELEGRAM_BOT_TOKEN = '7959499371:AAEV-_I36hL1mtdzSc5T21_2WSeMQQkkhBc'; // Замените на ваш токен
-        const GROUP_ID = '-4641203188'; // Замените на ваш group_id
-        
-        // User data from Telegram
-        let userData = {
-            id: tg.initDataUnsafe.user?.id || 0,
-            firstName: tg.initDataUnsafe.user?.first_name || 'Гость',
-            lastName: tg.initDataUnsafe.user?.last_name || '',
-            username: tg.initDataUnsafe.user?.username || '',
-            photoUrl: tg.initDataUnsafe.user?.photo_url || 'https://via.placeholder.com/50',
-            nova: 0,
-            tix: 0
+        // User data
+        const userData = {
+            id: 1,
+            name: "Пользователь",
+            username: "@user123",
+            novaBalance: 0,
+            tixBalance: 0,
+            avatarColor: "orange"
         };
 
         // Members data
-        let members = [];
-        
+        const membersData = [
+            { id: 2, name: "Алексей", username: "@alex", novaBalance: 125000, tixBalance: 12, avatarColor: "purple" },
+            { id: 3, name: "Мария", username: "@maria", novaBalance: 75000, tixBalance: 7, avatarColor: "pink" },
+            { id: 4, name: "Иван", username: "@ivan", novaBalance: 200000, tixBalance: 20, avatarColor: "blue" },
+            { id: 5, name: "Елена", username: "@elena", novaBalance: 50000, tixBalance: 5, avatarColor: "green" }
+        ];
+
         // Shop items
-        const shopItems = {
-            currency: [
-                { id: 'nova_10k', name: '10000❇️', price: 29.99, currency: 'rub', icon: '💰' },
-                { id: 'nova_25k', name: '25000❇️', price: 69.99, currency: 'rub', icon: '💰' },
-                { id: 'nova_50k', name: '50000❇️', price: 129.99, currency: 'rub', icon: '💰' },
-                { id: 'nova_75k', name: '75000❇️', price: 199.99, currency: 'rub', icon: '💰' },
-                { id: 'nova_100k', name: '100000❇️', price: 249.99, currency: 'rub', icon: '💰' },
-                { id: 'tix_10', name: '10✴️', price: 29.99, currency: 'rub', icon: '🪙' },
-                { id: 'tix_25', name: '25✴️', price: 69.99, currency: 'rub', icon: '🪙' },
-                { id: 'tix_50', name: '50✴️', price: 129.99, currency: 'rub', icon: '🪙' }
-            ],
-            privileges: [
-                { 
-                    id: 'create_polls', 
-                    name: 'Создание опросов', 
-                    description: 'Возможность создавать опросы в группе',
-                    price: 20000, 
-                    currency: 'nova', 
-                    icon: '📊',
-                    featured: false
-                },
-                { 
-                    id: 'custom_title', 
-                    name: 'Кастомное звание', 
-                    description: 'Собственное звание в чате без админских прав',
-                    price: 50000, 
-                    currency: 'nova', 
-                    icon: '🏷️',
-                    featured: false
-                },
-                { 
-                    id: 'random_nova', 
-                    name: 'Случайные новакоины', 
-                    description: 'От 10000 до 120000❇️',
-                    price: 50000, 
-                    currency: 'nova', 
-                    icon: '🎲',
-                    featured: false
-                },
-                { 
-                    id: 'lite_roulette', 
-                    name: 'Безумная рулетка (Lite)', 
-                    description: 'Шанс 50% удвоить или потерять 10%',
-                    price: 70000, 
-                    currency: 'nova', 
-                    icon: '🎰',
-                    featured: false
-                },
-                { 
-                    id: 'featured_silence', 
-                    name: 'Тишина!', 
-                    description: '5 минут без сообщений для всех',
-                    price: 120000, 
-                    currency: 'nova', 
-                    icon: '🔇',
-                    featured: true
-                },
-                { 
-                    id: 'featured_intern', 
-                    name: 'Стань стажером!', 
-                    description: 'Роль Стажера-администратора',
-                    price: 250000, 
-                    currency: 'nova', 
-                    icon: '👔',
-                    featured: true
-                }
-            ]
-        };
+        const shopItems = [
+            { id: 1, name: "Создание опросов", price: 20000, currency: "nova", isLimited: false },
+            { id: 2, name: "Кастомное звание", price: 50000, currency: "nova", isLimited: false },
+            { id: 3, name: "Случайные NOVA", price: 50000, currency: "nova", isLimited: false },
+            { id: 4, name: "Безумная рулетка (Lite)", price: 70000, currency: "nova", isLimited: true, timeLeft: "8:23:45" },
+            { id: 5, name: "Тишина! (5 мин)", price: 120000, currency: "nova", isLimited: true, timeLeft: "5:12:30" },
+            { id: 6, name: "10✴️", price: 10000, currency: "nova", isLimited: false },
+            { id: 7, name: "25✴️", price: 25000, currency: "nova", isLimited: false },
+            { id: 8, name: "50✴️", price: 50000, currency: "nova", isLimited: false }
+        ];
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Expand the WebApp to full view
-            tg.expand();
+            // Set user data
+            document.getElementById('user-avatar').textContent = userData.name.charAt(0);
+            document.getElementById('username').textContent = userData.name;
+            document.getElementById('nova-balance').textContent = userData.novaBalance + '❇️';
+            document.getElementById('tix-balance').textContent = userData.tixBalance + '✴️';
             
-            // Load user data
-            loadUserData();
+            // Set gift modal balances
+            document.getElementById('gift-nova-balance').textContent = userData.novaBalance + '❇️';
+            document.getElementById('gift-tix-balance').textContent = userData.tixBalance + '✴️';
             
-            // Load group members
-            loadGroupMembers();
-            
-            // Setup shop items
-            setupShop();
-            
-            // Setup event listeners
-            setupEventListeners();
-        });
+            // Set exchange modal balances
+            document.getElementById('exchange-nova-balance').textContent = userData.novaBalance + '❇️';
+            document.getElementById('exchange-tix-balance').textContent = userData.tixBalance + '✴️';
 
-        // Load user data from backend
-        function loadUserData() {
-            // Simulate API call - в реальности будет запрос к вашему бэкенду
-            setTimeout(() => {
-                userData.nova = 150000;
-                userData.tix = 35;
-                updateUserUI();
-            }, 500);
-        }
-
-        // Load group members from Telegram API
-        async function loadGroupMembers() {
-            try {
-                // В реальном приложении вам нужно будет сделать это через ваш бэкенд
-                // из-за ограничений CORS с Telegram API
-                
-                // Здесь симуляция загрузки участников
-                setTimeout(() => {
-                    members = [
-                        {
-                            id: 1,
-                            firstName: "Алексей",
-                            lastName: "Петров",
-                            username: "alex",
-                            photoUrl: "https://via.placeholder.com/40/4caf50/ffffff?text=AP",
-                            nova: 12000,
-                            tix: 42
-                        },
-                        {
-                            id: 2,
-                            firstName: "Мария",
-                            lastName: "Сидорова",
-                            username: "mary",
-                            photoUrl: "https://via.placeholder.com/40/ff9800/ffffff?text=MS",
-                            nova: 8500,
-                            tix: 21
-                        },
-                        {
-                            id: 3,
-                            firstName: "Дмитрий",
-                            lastName: "Иванов",
-                            username: "dima",
-                            photoUrl: "https://via.placeholder.com/40/2196f3/ffffff?text=DI",
-                            nova: 23000,
-                            tix: 75
-                        }
-                    ];
-                    updateMembersUI();
-                }, 800);
-            } catch (error) {
-                console.error("Ошибка загрузки участников:", error);
-            }
-        }
-
-        // Update user UI with current data
-        function updateUserUI() {
-            document.getElementById('user-avatar').src = userData.photoUrl;
-            document.getElementById('username').textContent = 
-                userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
-            
-            document.getElementById('nova-balance').textContent = userData.nova.toLocaleString() + '❇️';
-            document.getElementById('tix-balance').textContent = userData.tix.toLocaleString() + '✴️';
-            
-            document.getElementById('modal-nova-balance').textContent = userData.nova.toLocaleString() + '❇️';
-            document.getElementById('modal-tix-balance').textContent = userData.tix.toLocaleString() + '✴️';
-        }
-
-        // Update members list UI
-        function updateMembersUI() {
+            // Populate members list
             const membersList = document.getElementById('members-list');
-            membersList.innerHTML = '';
-            
-            members.forEach(member => {
+            membersData.forEach(member => {
                 const memberCard = document.createElement('div');
-                memberCard.className = 'member-card glass fade-in';
-                
-                const fullName = member.firstName + (member.lastName ? ' ' + member.lastName : '');
-                const username = member.username ? '@' + member.username : '';
-                
+                memberCard.className = 'member-card card';
                 memberCard.innerHTML = `
-                    <img src="${member.photoUrl}" alt="Аватар" class="member-avatar">
+                    <div class="member-avatar" style="background: ${getAvatarColor(member.avatarColor)}">${member.name.charAt(0)}</div>
                     <div class="member-info">
-                        <div class="member-name">${fullName}</div>
-                        <div class="member-username">${username}</div>
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-username">${member.username}</div>
                     </div>
                     <div class="member-balance">
-                        <div class="balance-badge nova-badge">${member.nova.toLocaleString()}❇️</div>
-                        <div class="balance-badge tix-badge">${member.tix.toLocaleString()}✴️</div>
+                        <div class="balance-badge nova-badge">${member.novaBalance}❇️</div>
+                        <div class="balance-badge tix-badge">${member.tixBalance}✴️</div>
                     </div>
                 `;
-                
                 membersList.appendChild(memberCard);
             });
-        }
 
-        // Setup shop items
-        function setupShop() {
-            const currencyShop = document.getElementById('currency-shop');
-            const privilegesShop = document.getElementById('privileges-shop');
-            
-            // Add currency items
-            shopItems.currency.forEach(item => {
-                const shopItem = createShopItemElement(item);
-                currencyShop.appendChild(shopItem);
-            });
-            
-            // Add privilege items
-            shopItems.privileges.forEach(item => {
-                const shopItem = createShopItemElement(item);
-                privilegesShop.appendChild(shopItem);
-            });
-        }
-
-        function createShopItemElement(item) {
-            const shopItem = document.createElement('div');
-            shopItem.className = `shop-item ${item.featured ? 'featured' : ''} glass`;
-            
-            const priceText = item.currency === 'rub' ? 
-                `${item.price.toLocaleString()}₽` : 
-                `${item.price.toLocaleString()}${item.currency === 'nova' ? '❇️' : '✴️'}`;
-            
-            shopItem.innerHTML = `
-                <div class="shop-item-icon">${item.icon || '🛒'}</div>
-                <div class="shop-item-info">
-                    <div class="shop-item-name">${item.name}</div>
-                    <div class="shop-item-desc">${item.description || 'Пополнить баланс'}</div>
-                </div>
-                <div class="shop-item-price">${priceText}</div>
-            `;
-            
-            shopItem.addEventListener('click', () => {
-                purchaseItem(item);
-            });
-            
-            return shopItem;
-        }
-
-        // Purchase item function
-        function purchaseItem(item) {
-            if (item.currency !== 'rub') {
-                if (item.currency === 'nova' && item.price > userData.nova) {
-                    alert('Недостаточно новакоинов');
-                    return;
-                }
-                if (item.currency === 'tix' && item.price > userData.tix) {
-                    alert('Недостаточно тиксов');
-                    return;
-                }
-            }
-            
-            // В реальном приложении здесь будет вызов API к вашему боту
-            if (item.currency === 'rub') {
-                alert(`Для покупки ${item.name} обратитесь к @Matt_production`);
-            } else {
-                // Симуляция покупки
-                const confirmPurchase = confirm(`Купить ${item.name} за ${item.price}${item.currency === 'nova' ? '❇️' : '✴️'}?`);
-                
-                if (confirmPurchase) {
-                    // Обновляем баланс
-                    if (item.currency === 'nova') {
-                        userData.nova -= item.price;
-                    } else {
-                        userData.tix -= item.price;
-                    }
-                    
-                    // Применяем эффект товара
-                    applyItemEffect(item);
-                    
-                    // Обновляем UI
-                    updateUserUI();
-                    
-                    // Показываем сообщение о покупке
-                    alert(`Вы успешно приобрели ${item.name}!`);
-                }
-            }
-        }
-
-        // Apply item effect
-        function applyItemEffect(item) {
-            switch(item.id) {
-                case 'random_nova':
-                    const randomNova = Math.floor(10000 + Math.random() * 110000);
-                    userData.nova += randomNova;
-                    alert(`Вы получили ${randomNova.toLocaleString()}❇️!`);
-                    break;
-                    
-                case 'lite_roulette':
-                    const isWin = Math.random() > 0.5;
-                    if (isWin) {
-                        userData.nova += 140000;
-                        alert(`Поздравляем! Вы выиграли 140000❇️!`);
-                    } else {
-                        const loseAmount = Math.floor(userData.nova * 0.1);
-                        userData.nova -= loseAmount;
-                        alert(`К сожалению, вы потеряли ${loseAmount.toLocaleString()}❇️. Попробуйте ещё раз!`);
-                    }
-                    break;
-                    
-                // Другие эффекты товаров...
-            }
-            
-            // Здесь должен быть вызов к вашему боту для применения эффекта в группе
-            // Например: sendToBot(`purchase:${item.id}`);
-        }
-
-        // Setup all event listeners
-        function setupEventListeners() {
-            // AI input
-            document.getElementById('ai-input').addEventListener('input', function() {
-                const sendBtn = document.getElementById('ai-send-btn');
-                sendBtn.disabled = this.value.trim() === '';
-            });
-            
-            document.getElementById('ai-send-btn').addEventListener('click', function() {
-                const input = document.getElementById('ai-input');
-                if (input.value.trim() !== '') {
-                    alert('Запрос отправлен в нейросеть: ' + input.value);
-                    input.value = '';
-                    this.disabled = true;
-                }
-            });
-            
-            // Report submit
-            document.getElementById('report-submit').addEventListener('click', function() {
-                const reportInput = document.getElementById('report-input');
-                if (reportInput.value.trim() === '') {
-                    alert('Введите ссылку на сообщение');
-                    return;
-                }
-                
-                // Simulate API call
-                const reportBlock = document.querySelector('.report-block');
-                reportBlock.innerHTML = `
-                    <div style="padding: 20px; text-align: center; animation: fadeIn 0.3s ease-out;">
-                        ✅ Готово! Сообщили администраторам и вернули тебе 6000❇️ на баланс
+            // Populate shop items
+            const shopItemsContainer = document.getElementById('shop-items');
+            shopItems.forEach(item => {
+                const shopItem = document.createElement('div');
+                shopItem.className = 'shop-item card';
+                shopItem.innerHTML = `
+                    <div class="shop-item-image">
+                        <i class="nav-icon">🛍️</i>
                     </div>
+                    <div class="shop-item-info">
+                        <div class="shop-item-name">
+                            ${item.name}
+                            ${item.isLimited ? '<span class="limited-tag">LIMITED</span>' : ''}
+                        </div>
+                        ${item.isLimited ? `<div class="report-description">Исчезнет через: ${item.timeLeft}</div>` : ''}
+                    </div>
+                    <div class="shop-item-price">${item.price}${item.currency === 'nova' ? '❇️' : '✴️'}</div>
                 `;
+                shopItemsContainer.appendChild(shopItem);
+            });
+
+            // Event listeners
+            document.getElementById('gift-btn').addEventListener('click', function() {
+                document.getElementById('gift-modal').style.display = 'flex';
+            });
+
+            document.getElementById('close-gift-modal').addEventListener('click', function() {
+                document.getElementById('gift-modal').style.display = 'none';
+            });
+
+            document.getElementById('exchange-btn').addEventListener('click', function() {
+                document.getElementById('exchange-modal').style.display = 'flex';
+            });
+
+            document.getElementById('close-exchange-modal').addEventListener('click', function() {
+                document.getElementById('exchange-modal').style.display = 'none';
+            });
+
+            document.getElementById('buy-btn').addEventListener('click', function() {
+                showPage('shop');
+            });
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+
+            document.getElementById('ai-back-btn').addEventListener('click', function() {
+                showPage('home');
+            });
+
+            // Report button
+            document.getElementById('report-btn').addEventListener('click', function() {
+                const result = Math.random() > 0.5 ? 'success' : 'failure';
+                const reportResult = document.getElementById('report-result');
                 
+                if (result === 'success') {
+                    reportResult.innerHTML = '✅ Готово! Сообщили администраторам и вернули тебе 6000❇️ на баланс';
+                    userData.novaBalance += 6000;
+                    document.getElementById('nova-balance').textContent = userData.novaBalance + '❇️';
+                } else {
+                    reportResult.innerHTML = '😥 К сожалению (или к счастью) в этом сообщении нет нарушений';
+                }
+                
+                reportResult.style.display = 'block';
                 setTimeout(() => {
-                    location.reload();
+                    reportResult.style.display = 'none';
                 }, 5000);
             });
-            
-            // Action buttons
-            document.getElementById('exchange-btn').addEventListener('click', openExchangeModal);
-            document.getElementById('buy-btn').addEventListener('click', openShopModal);
-            document.getElementById('gift-btn').addEventListener('click', openGiftModal);
-            
-            // Balance buttons
-            document.getElementById('nova-balance-btn').addEventListener('click', function() {
-                this.classList.add('pulse');
-                setTimeout(() => this.classList.remove('pulse'), 300);
+
+            // GPT input
+            document.querySelector('.gpt-section .input-field').addEventListener('input', function() {
+                const sendBtn = document.getElementById('send-gpt-btn');
+                sendBtn.disabled = this.value.trim() === '';
             });
-            
-            document.getElementById('tix-balance-btn').addEventListener('click', function() {
-                this.classList.add('pulse');
-                setTimeout(() => this.classList.remove('pulse'), 300);
-            });
-            
-            // Sort button
-            document.getElementById('sort-btn').addEventListener('click', function() {
-                alert('Функция сортировки будет реализована позже');
-            });
-            
-            // Bottom menu
-            document.querySelectorAll('.menu-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if (this.classList.contains('active')) return;
-                    
-                    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+
+            // Currency selector
+            document.querySelectorAll('.currency-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.currency-option').forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
-                    
-                    const page = this.getAttribute('data-page');
-                    alert(`Переход на страницу: ${page}`);
                 });
             });
-            
-            // Gift modals
-            document.getElementById('close-gift-modal').addEventListener('click', closeGiftModal);
-            document.getElementById('close-send-gift-modal').addEventListener('click', closeSendGiftModal);
-            document.getElementById('send-gift-btn').addEventListener('click', sendGift);
-            
-            // Currency selection
-            document.getElementById('select-nova').addEventListener('click', function() {
-                document.getElementById('select-nova').classList.add('active');
-                document.getElementById('select-tix').classList.remove('active');
-                document.getElementById('gift-currency').textContent = '❇️';
-            });
-            
-            document.getElementById('select-tix').addEventListener('click', function() {
-                document.getElementById('select-tix').classList.add('active');
-                document.getElementById('select-nova').classList.remove('active');
-                document.getElementById('gift-currency').textContent = '✴️';
-            });
-            
-            // Exchange modals
-            document.getElementById('close-exchange-modal').addEventListener('click', closeExchangeModal);
-            document.getElementById('exchange-submit-btn').addEventListener('click', exchangeCurrency);
-            
-            document.getElementById('exchange-from-nova').addEventListener('click', function() {
-                document.getElementById('exchange-from-nova').classList.add('active');
-                document.getElementById('exchange-from-tix').classList.remove('active');
-                document.getElementById('exchange-from-currency').textContent = '❇️';
-                document.getElementById('exchange-to-currency').textContent = '✴️';
-                calculateExchange();
-            });
-            
-            document.getElementById('exchange-from-tix').addEventListener('click', function() {
-                document.getElementById('exchange-from-tix').classList.add('active');
-                document.getElementById('exchange-from-nova').classList.remove('active');
-                document.getElementById('exchange-from-currency').textContent = '✴️';
-                document.getElementById('exchange-to-currency').textContent = '❇️';
-                calculateExchange();
-            });
-            
-            document.getElementById('exchange-amount').addEventListener('input', calculateExchange);
-            
-            // Shop modal
-            document.getElementById('close-shop-modal').addEventListener('click', closeShopModal);
-            
-            // Shop tabs
-            document.querySelectorAll('.shop-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.shop-content').forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    
-                    document.getElementById(`${this.dataset.tab}-shop`).style.display = 'block';
-                });
-            });
-        }
+        });
 
-        // Gift modal functions
-        function openGiftModal() {
-            const modal = document.getElementById('gift-modal');
-            const membersList = document.getElementById('members-modal-list');
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById('app').style.display = 'block';
             
-            membersList.innerHTML = '';
-            
-            members.forEach(member => {
-                if (member.id === userData.id) return; // Skip self
-                
-                const memberItem = document.createElement('div');
-                memberItem.className = 'gift-member glass';
-                
-                const fullName = member.firstName + (member.lastName ? ' ' + member.lastName : '');
-                const username = member.username ? '@' + member.username : '';
-                
-                memberItem.innerHTML = `
-                    <img src="${member.photoUrl}" alt="Аватар" class="gift-member-avatar">
-                    <div class="gift-member-info">
-                        <div class="gift-member-name">${fullName}</div>
-                        <div class="gift-member-username">${username}</div>
-                    </div>
-                `;
-                
-                memberItem.addEventListener('click', () => {
-                    closeGiftModal();
-                    openSendGiftModal(member);
-                });
-                
-                membersList.appendChild(memberItem);
-            });
-            
-            modal.classList.add('show');
-        }
-
-        function closeGiftModal() {
-            document.getElementById('gift-modal').classList.remove('show');
-        }
-
-        function openSendGiftModal(member) {
-            const modal = document.getElementById('send-gift-modal');
-            modal.classList.add('show');
-            
-            // Store selected member
-            modal.setAttribute('data-member-id', member.id);
-        }
-
-        function closeSendGiftModal() {
-            document.getElementById('send-gift-modal').classList.remove('show');
-        }
-
-        function sendGift() {
-            const modal = document.getElementById('send-gift-modal');
-            const amount = parseInt(document.getElementById('gift-amount').value);
-            const currency = document.getElementById('gift-currency').textContent;
-            const memberId = modal.getAttribute('data-member-id');
-            
-            if (!amount || isNaN(amount) || amount <= 0) {
-                alert('Введите корректную сумму');
-                return;
-            }
-            
-            // Find member
-            const member = members.find(m => m.id == memberId);
-            if (!member) {
-                alert('Ошибка: участник не найден');
-                return;
-            }
-            
-            // Check balance
-            if (currency === '❇️' && amount > userData.nova) {
-                alert('Недостаточно новакоинов');
-                return;
-            }
-            
-            if (currency === '✴️' && amount > userData.tix) {
-                alert('Недостаточно тиксов');
-                return;
-            }
-            
-            // In production, this would be an API call
-            alert(`Вы подарили ${amount}${currency} пользователю ${member.firstName}!`);
-            
-            // Update UI (simulated)
-            if (currency === '❇️') {
-                userData.nova -= amount;
-                member.nova += amount;
+            if (page === 'home') {
+                document.getElementById('app').style.display = 'block';
             } else {
-                userData.tix -= amount;
-                member.tix += amount;
-            }
-            
-            updateUserUI();
-            updateMembersUI();
-            closeSendGiftModal();
-        }
-
-        // Exchange modal functions
-        function openExchangeModal() {
-            const modal = document.getElementById('exchange-modal');
-            modal.classList.add('show');
-            calculateExchange();
-        }
-
-        function closeExchangeModal() {
-            document.getElementById('exchange-modal').classList.remove('show');
-        }
-
-        function calculateExchange() {
-            const amount = parseFloat(document.getElementById('exchange-amount').value) || 0;
-            const fromNova = document.getElementById('exchange-from-nova').classList.contains('active');
-            
-            if (fromNova) {
-                // NOVA to TIX
-                const result = amount / 10000;
-                document.getElementById('exchange-result').value = result.toFixed(4);
-            } else {
-                // TIX to NOVA
-                const result = amount * 10000;
-                document.getElementById('exchange-result').value = result.toLocaleString();
+                document.getElementById('app').style.display = 'none';
+                document.getElementById(`${page}-page`).style.display = 'block';
             }
         }
 
-        function exchangeCurrency() {
-            const amount = parseFloat(document.getElementById('exchange-amount').value) || 0;
-            const fromNova = document.getElementById('exchange-from-nova').classList.contains('active');
-            
-            if (amount <= 0) {
-                alert('Введите корректную сумму');
-                return;
-            }
-            
-            if (fromNova) {
-                // NOVA to TIX
-                if (amount > userData.nova) {
-                    alert('Недостаточно новакоинов');
-                    return;
-                }
-                
-                const result = amount / 10000;
-                userData.nova -= amount;
-                userData.tix += result;
-            } else {
-                // TIX to NOVA
-                if (amount > userData.tix) {
-                    alert('Недостаточно тиксов');
-                    return;
-                }
-                
-                const result = amount * 10000;
-                userData.tix -= amount;
-                userData.nova += result;
-            }
-            
-            alert('Обмен выполнен успешно!');
-            updateUserUI();
-            closeExchangeModal();
-        }
-
-        // Shop modal functions
-        function openShopModal() {
-            const modal = document.getElementById('shop-modal');
-            modal.classList.add('show');
-        }
-
-        function closeShopModal() {
-            document.getElementById('shop-modal').classList.remove('show');
-        }
-
-        // Send data to bot (for real implementation)
-        function sendToBot(command) {
-            // В реальном приложении здесь будет fetch-запрос к вашему боту
-            console.log("Sending to bot:", command);
+        function getAvatarColor(color) {
+            const colors = {
+                orange: 'linear-gradient(145deg, #FF6B35, #FF9E1F)',
+                purple: 'linear-gradient(145deg, #9B5DE5, #6A4C93)',
+                pink: 'linear-gradient(145deg, #F15BB5, #EF476F)',
+                blue: 'linear-gradient(145deg, #00BBF9, #00A8E8)',
+                green: 'linear-gradient(145deg, #4BB543, #2E8B57)'
+            };
+            return colors[color] || colors.orange;
         }
     </script>
 </body>

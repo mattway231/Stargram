@@ -10,6 +10,7 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     WebAppInfo
 )
+from aiohttp import web
 
 # Настройка логирования
 logging.basicConfig(
@@ -65,14 +66,19 @@ async def cmd_start(message: Message):
         logger.error(f"Error: {e}", exc_info=True)
         await message.reply("⚠️ Произошла ошибка. Попробуйте позже.")
 
-async def main():
-    try:
-        logger.info("Starting bot...")
-        await dp.start_polling(bot)
-    except Exception as e:
-        logger.error(f"Bot stopped: {e}", exc_info=True)
-    finally:
-        await bot.session.close()
+async def handle(request):
+    return web.Response(text="Bot is running")
+
+app = web.Application()
+app.add_routes([web.get('/', handle)])
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Запускаем бота и сервер в одном event loop
+    async def run():
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', 8080)
+        await site.start()
+        await dp.start_polling(bot)
+    
+    asyncio.run(run())

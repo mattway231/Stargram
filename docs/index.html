@@ -5,105 +5,745 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stargram</title>
     <style>
+        /* Основные стили */
         @font-face {
             font-family: 'Benzin';
-            src: url('fonts/benzin-medium.woff2?v=2') format('woff2');
+            src: url('fonts/Benzin-Bold.woff2') format('woff2'),
+                 url('fonts/Benzin-Medium.woff2') format('woff2');
             font-weight: normal;
+            font-style: normal;
         }
-        @font-face {
-            font-family: 'Benzin';
-            src: url('fonts/benzin-bold.woff2?v=2') format('woff2');
-            font-weight: bold;
-        }
-        
+
         :root {
-            --dark-bg: #121212;
-            --glass-orange: rgba(255, 107, 53, 0.15);
-            --glass-purple: rgba(142, 45, 226, 0.15);
-            --text-light: rgba(255, 255, 255, 0.9);
+            --bg-color: #13131a;
+            --text-gradient: linear-gradient(90deg, #daa136, #da8e36);
+            --border-color: #3c3534;
+            --card-gradient: linear-gradient(135deg, #2f2927, #3c3534);
+            --button-gradient: linear-gradient(135deg, #3a342e, #4d443c);
+            --button-hover: linear-gradient(135deg, #4d443c, #5a5047);
+            --nova-gradient: linear-gradient(135deg, #1a3b1d, #2d5a31);
+            --tix-gradient: linear-gradient(135deg, #5a3d1a, #8a5b2a);
+            --purple-gradient: linear-gradient(135deg, #2d1a4b, #4a2d7a);
         }
-        
-        body {
-            background: url('https://i.pinimg.com/474x/04/e9/8b/04e98bc8bfb8a89092cec3795660672d.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Benzin', sans-serif;
-            color: var(--text-light);
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Benzin', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
             min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        /* Glass эффект */
+        .glass {
+            background: rgba(47, 41, 39, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Текст с градиентом */
+        .gradient-text {
+            background: var(--text-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        /* Основной контейнер */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
             padding: 20px;
         }
-        
-        h1 {
-            font-weight: bold; /* Использует Benzin Bold */
+
+        /* Шапка профиля */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        
-        .glass-card {
-            background: linear-gradient(135deg, var(--glass-orange), var(--glass-purple));
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            margin: 10px;
+
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--border-color);
         }
-    </style>
-</head>
-<style>
-        .tg-login-btn {
-            background: linear-gradient(90deg, #FF6B35, #8E2DE2);
-            border: none;
-            border-radius: 50px;
-            padding: 12px 24px;
-            color: white;
-            font-family: 'Benzin', sans-serif;
-            font-weight: bold;
-            cursor: pointer;
+
+        .profile-name {
+            font-size: 18px;
+            background: var(--text-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Блок нейросети */
+        .ai-block {
+            padding: 15px;
+            margin-bottom: 20px;
+            background: var(--purple-gradient);
+        }
+
+        .ai-title {
             font-size: 16px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
         }
-        .tg-login-btn:hover {
+
+        .ai-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .ai-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .ai-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--text-gradient);
+            border: none;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Блок жалобы */
+        .report-block {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .report-desc {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .report-input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .report-input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .report-submit {
+            padding: 10px 15px;
+            border-radius: 20px;
+            background: var(--button-gradient);
+            color: white;
+            border: none;
+            margin-left: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .report-submit:hover {
+            background: var(--button-hover);
+        }
+
+        .report-note {
+            font-size: 10px;
+            opacity: 0.5;
+        }
+
+        /* Блок баланса */
+        .balance-label {
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .balance-block {
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .balance-item {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .nova-balance {
+            background: var(--nova-gradient);
+        }
+
+        .tix-balance {
+            background: var(--tix-gradient);
+        }
+
+        .balance-amount {
+            font-size: 18px;
+            margin-top: 5px;
+        }
+
+        /* Кнопки действий */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            width: 30%;
+            padding: 15px 0;
+            border-radius: 12px;
+            background: var(--button-gradient);
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-btn:hover {
+            background: var(--button-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Список участников */
+        .members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .members-title {
+            font-size: 16px;
+        }
+
+        .sort-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+        }
+
+        .members-list {
+            margin-bottom: 20px;
+        }
+
+        .member-card {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .member-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 14px;
+        }
+
+        .member-username {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .member-balance {
+            display: flex;
+        }
+
+        .balance-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 5px;
+            opacity: 0.8;
+        }
+
+        .nova-badge {
+            background: rgba(45, 90, 49, 0.3);
+        }
+
+        .tix-badge {
+            background: rgba(138, 91, 42, 0.3);
+        }
+
+        /* Нижнее меню */
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-gradient);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .menu-btn.active {
+            opacity: 1;
+            color: #da8e36;
+        }
+
+        .menu-btn:hover {
+            opacity: 1;
+        }
+
+        .menu-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+
+        /* Модальные окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-gradient);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div class="glass-card" id="authBlock">
-        <h1>STARGRAM</h1>
-        <p id="statusText">Подключение к боту...</p>
-        <button class="tg-login-btn" id="tgLogin" style="display: none;">Войти через Telegram</button>
+    <div class="container">
+        <!-- Шапка профиля -->
+        <div class="profile-header glass fade-in">
+            <img src="https://via.placeholder.com/50" alt="Аватар" class="profile-avatar" id="user-avatar">
+            <div class="profile-name" id="username">Загрузка...</div>
+        </div>
+
+        <!-- Блок нейросети -->
+        <div class="ai-block glass fade-in">
+            <div class="ai-title">Нейросеть GPT-4o</div>
+            <div class="ai-input-container">
+                <input type="text" class="ai-input" placeholder="Написать нейросети" id="ai-input">
+                <button class="ai-send-btn" disabled id="ai-send-btn">
+                    ↑
+                </button>
+            </div>
+        </div>
+
+        <!-- Блок жалобы -->
+        <div class="report-block glass fade-in">
+            <div class="report-title">Пожаловаться на игрока</div>
+            <div class="report-desc">Отправь ссылку на сообщение с нарушением. ИИ проверит его и даст тебе 6000❇️</div>
+            <div class="report-input-container">
+                <input type="text" class="report-input" placeholder="Ссылка на сообщение" id="report-input">
+                <button class="report-submit" id="report-submit">5000❇️</button>
+            </div>
+            <div class="report-note">Жалоба стоит 5000❇️. Если нарушение подтвердится, получишь 120% (6000❇️)</div>
+        </div>
+
+        <!-- Блок баланса -->
+        <div class="balance-label">Баланс</div>
+        <div class="balance-block glass fade-in">
+            <div class="balance-item nova-balance">
+                <div>$NOVA</div>
+                <div class="balance-amount" id="nova-balance">0❇️</div>
+            </div>
+            <div class="balance-item tix-balance">
+                <div>$TIX</div>
+                <div class="balance-amount" id="tix-balance">0✴️</div>
+            </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="action-buttons fade-in">
+            <button class="action-btn pulse" id="exchange-btn">
+                <span class="action-icon">⇄</span>
+                Обменять
+            </button>
+            <button class="action-btn pulse" id="buy-btn">
+                <span class="action-icon">🛒</span>
+                Купить
+            </button>
+            <button class="action-btn pulse" id="gift-btn">
+                <span class="action-icon">🎁</span>
+                Подарить
+            </button>
+        </div>
+
+        <!-- Список участников -->
+        <div class="members-header">
+            <div class="members-title">Участники</div>
+            <button class="sort-btn" id="sort-btn">
+                Сортировать
+                <span class="sort-icon">▼</span>
+            </button>
+        </div>
+        <div class="members-list" id="members-list">
+            <!-- Участники будут добавляться сюда через JS -->
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-menu glass">
+        <button class="menu-btn active">
+            <span class="menu-icon">🏠</span>
+            Главная
+        </button>
+        <button class="menu-btn">
+            <span class="menu-icon">🤖</span>
+            Нейросети
+        </button>
+        <button class="menu-btn">
+            <span class="menu-icon">🗺️</span>
+            StarMap
+        </button>
+        <button class="menu-btn">
+            <span class="menu-icon">🛍️</span>
+            Магазин
+        </button>
+    </div>
+
+    <!-- Модальное окно для подарка -->
+    <div class="modal-overlay" id="gift-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-gift-modal">×</button>
+            <h3>Выберите участника</h3>
+            <input type="text" placeholder="Поиск..." class="ai-input" id="member-search" style="width: 100%; margin: 10px 0;">
+            <div id="members-modal-list" style="max-height: 300px; overflow-y: auto;">
+                <!-- Список участников для выбора -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для отправки подарка -->
+    <div class="modal-overlay" id="send-gift-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-send-gift-modal">×</button>
+            <div style="display: flex; margin-bottom: 15px;">
+                <div class="balance-item nova-balance" style="flex: 1; margin-right: 5px;" id="select-nova">
+                    <div>Ваши NOVA</div>
+                    <div class="balance-amount" id="modal-nova-balance">0❇️</div>
+                </div>
+                <div class="balance-item tix-balance" style="flex: 1; margin-left: 5px;" id="select-tix">
+                    <div>Ваши TIX</div>
+                    <div class="balance-amount" id="modal-tix-balance">0✴️</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <input type="number" placeholder="Сумма" class="ai-input" id="gift-amount" style="flex: 1;">
+                <div style="margin-left: 10px; font-size: 20px;" id="gift-currency">❇️</div>
+            </div>
+            <button class="report-submit" style="width: 100%;" id="send-gift-btn">Отправить</button>
+        </div>
     </div>
 
     <script>
-        // Проверяем, открыто ли в Telegram WebApp
-        if (window.Telegram && Telegram.WebApp.initData) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            checkGroupMembership(user.id);
-        } else {
-            document.getElementById('statusText').textContent = "Откройте приложение через бота Telegram!";
-            document.getElementById('tgLogin').style.display = 'block';
+        // Данные пользователя (в реальности будут получаться из API)
+        const userData = {
+            username: "Иван Иванов",
+            avatar: "https://via.placeholder.com/50",
+            nova: 15000,
+            tix: 350
+        };
+
+        // Список участников (в реальности будет из API)
+        const members = [
+            { id: 1, name: "Алексей Петров", username: "@alex", avatar: "https://via.placeholder.com/40", nova: 12000, tix: 420 },
+            { id: 2, name: "Мария Сидорова", username: "@mary", avatar: "https://via.placeholder.com/40", nova: 8500, tix: 210 },
+            { id: 3, name: "Дмитрий Иванов", username: "@dima", avatar: "https://via.placeholder.com/40", nova: 23000, tix: 750 },
+            { id: 4, name: "Елена Смирнова", username: "@lena", avatar: "https://via.placeholder.com/40", nova: 5000, tix: 90 },
+            { id: 5, name: "Сергей Кузнецов", username: "@serg", avatar: "https://via.placeholder.com/40", nova: 18000, tix: 530 }
+        ];
+
+        // Инициализация данных
+        document.addEventListener('DOMContentLoaded', function() {
+            // Заполняем данные пользователя
+            document.getElementById('user-avatar').src = userData.avatar;
+            document.getElementById('username').textContent = userData.username;
+            document.getElementById('nova-balance').textContent = userData.nova + '❇️';
+            document.getElementById('tix-balance').textContent = userData.tix + '✴️';
+            document.getElementById('modal-nova-balance').textContent = userData.nova + '❇️';
+            document.getElementById('modal-tix-balance').textContent = userData.tix + '✴️';
+
+            // Заполняем список участников
+            renderMembersList(members);
+
+            // Обработчик ввода в поле нейросети
+            document.getElementById('ai-input').addEventListener('input', function() {
+                const sendBtn = document.getElementById('ai-send-btn');
+                sendBtn.disabled = this.value.trim() === '';
+            });
+
+            // Обработчик отправки в нейросеть
+            document.getElementById('ai-send-btn').addEventListener('click', function() {
+                const input = document.getElementById('ai-input');
+                if (input.value.trim() !== '') {
+                    alert('Запрос отправлен в нейросеть: ' + input.value);
+                    input.value = '';
+                    this.disabled = true;
+                }
+            });
+
+            // Обработчик жалобы
+            document.getElementById('report-submit').addEventListener('click', function() {
+                const reportInput = document.getElementById('report-input');
+                if (reportInput.value.trim() === '') {
+                    alert('Введите ссылку на сообщение');
+                    return;
+                }
+
+                // Симуляция отправки жалобы
+                const reportBlock = document.querySelector('.report-block');
+                reportBlock.innerHTML = '<div style="padding: 20px; text-align: center;">✅ Готово! Сообщили администраторам и вернули тебе 6000❇️ на баланс</div>';
+                
+                setTimeout(() => {
+                    location.reload(); // В реальности нужно будет обновить только блок жалобы
+                }, 5000);
+            });
+
+            // Обработчики кнопок действий
+            document.getElementById('exchange-btn').addEventListener('click', function() {
+                alert('Функция обмена будет реализована позже');
+            });
+
+            document.getElementById('buy-btn').addEventListener('click', function() {
+                alert('Функция покупки будет реализована позже');
+            });
+
+            document.getElementById('gift-btn').addEventListener('click', function() {
+                openGiftModal();
+            });
+
+            // Модальное окно подарка
+            document.getElementById('close-gift-modal').addEventListener('click', closeGiftModal);
+            document.getElementById('close-send-gift-modal').addEventListener('click', closeSendGiftModal);
+            document.getElementById('send-gift-btn').addEventListener('click', sendGift);
+
+            // Выбор валюты для подарка
+            document.getElementById('select-nova').addEventListener('click', function() {
+                document.getElementById('gift-currency').textContent = '❇️';
+            });
+
+            document.getElementById('select-tix').addEventListener('click', function() {
+                document.getElementById('gift-currency').textContent = '✴️';
+            });
+        });
+
+        // Функция отображения списка участников
+        function renderMembersList(members) {
+            const membersList = document.getElementById('members-list');
+            membersList.innerHTML = '';
+
+            members.forEach(member => {
+                const memberCard = document.createElement('div');
+                memberCard.className = 'member-card glass fade-in';
+                memberCard.innerHTML = `
+                    <img src="${member.avatar}" alt="Аватар" class="member-avatar">
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-username">${member.username}</div>
+                    </div>
+                    <div class="member-balance">
+                        <div class="balance-badge nova-badge">${member.nova}❇️</div>
+                        <div class="balance-badge tix-badge">${member.tix}✴️</div>
+                    </div>
+                `;
+                membersList.appendChild(memberCard);
+            });
         }
 
-        async function checkGroupMembership(userId) {
-            try {
-                const response = await fetch('https://your-render-app.onrender.com/check_user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId })
+        // Функции для работы с модальными окнами
+        function openGiftModal() {
+            document.getElementById('gift-modal').style.display = 'flex';
+            const modalList = document.getElementById('members-modal-list');
+            modalList.innerHTML = '';
+
+            members.forEach(member => {
+                const memberItem = document.createElement('div');
+                memberItem.className = 'member-card';
+                memberItem.innerHTML = `
+                    <img src="${member.avatar}" alt="Аватар" class="member-avatar">
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-username">${member.username}</div>
+                    </div>
+                `;
+                memberItem.addEventListener('click', () => {
+                    closeGiftModal();
+                    openSendGiftModal(member);
                 });
-                
-                const data = await response.json();
-                if (data.is_member) {
-                    window.location.href = "main.html"; // Переход для участников
-                } else {
-                    document.getElementById('statusText').textContent = "❌ Доступ только для участников чата!";
-                }
-            } catch (error) {
-                console.error("Ошибка:", error);
+                modalList.appendChild(memberItem);
+            });
+        }
+
+        function closeGiftModal() {
+            document.getElementById('gift-modal').style.display = 'none';
+        }
+
+        function openSendGiftModal(member) {
+            document.getElementById('send-gift-modal').style.display = 'flex';
+            // Здесь можно добавить данные о получателе
+        }
+
+        function closeSendGiftModal() {
+            document.getElementById('send-gift-modal').style.display = 'none';
+        }
+
+        function sendGift() {
+            const amount = document.getElementById('gift-amount').value;
+            const currency = document.getElementById('gift-currency').textContent;
+            
+            if (!amount || isNaN(amount) || parseInt(amount) <= 0) {
+                alert('Введите корректную сумму');
+                return;
             }
+
+            alert(`Вы подарили ${amount}${currency}!`);
+            closeSendGiftModal();
         }
     </script>
 </body>

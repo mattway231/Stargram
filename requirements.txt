@@ -1,3 +1,3 @@
-aiogram==3.0.0rc2  # Новая версия с поддержкой Python 3.13
-httpx==0.27.0      # Современная альтернатива aiohttp
+aiogram==3.0.0rc2
+httpx==0.27.0
 python-dotenv==1.0.0

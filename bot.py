@@ -19,7 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Конфигурация
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.getenv("TOKEN")
 GROUP_ID = int(os.getenv("GROUP_ID", "-4641203188"))
 
 # Инициализация бота (новая версия aiogram 3.0.0rc2)

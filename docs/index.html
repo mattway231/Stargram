@@ -2,10 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stargram</title>
     <style>
-        /* Основные стили */
+        /* Liquid Glass Effect */
+        :root {
+            --bg-color: #0a0a12;
+            --text-gradient: linear-gradient(90deg, #ffb347, #ff8a3d);
+            --glass-color: rgba(30, 30, 40, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+            --nova-color: #4caf50;
+            --tix-color: #ff9800;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
         @font-face {
             font-family: 'Benzin';
             src: url('fonts/Benzin-Bold.woff2') format('woff2'),
@@ -14,93 +25,105 @@
             font-style: normal;
         }
 
-        :root {
-            --bg-color: #13131a;
-            --text-gradient: linear-gradient(90deg, #daa136, #da8e36);
-            --border-color: #3c3534;
-            --card-gradient: linear-gradient(135deg, #2f2927, #3c3534);
-            --button-gradient: linear-gradient(135deg, #3a342e, #4d443c);
-            --button-hover: linear-gradient(135deg, #4d443c, #5a5047);
-            --nova-gradient: linear-gradient(135deg, #1a3b1d, #2d5a31);
-            --tix-gradient: linear-gradient(135deg, #5a3d1a, #8a5b2a);
-            --purple-gradient: linear-gradient(135deg, #2d1a4b, #4a2d7a);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
             font-family: 'Benzin', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background: var(--bg-color);
             color: white;
             min-height: 100vh;
             padding-bottom: 80px;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* Glass эффект */
+        /* Liquid Glass Effect */
         .glass {
-            background: rgba(47, 41, 39, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            background: var(--glass-color);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Текст с градиентом */
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                var(--glass-highlight),
+                transparent
+            );
+            transform: rotate(30deg);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
         .gradient-text {
             background: var(--text-gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            display: inline-block;
         }
 
-        /* Основной контейнер */
         .container {
-            max-width: 500px;
+            max-width: 100%;
+            width: 100%;
+            padding: 15px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        /* Шапка профиля */
+        /* Header */
         .profile-header {
             display: flex;
             align-items: center;
+            padding: 12px;
             margin-bottom: 20px;
         }
 
         .profile-avatar {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 15px;
-            border: 2px solid var(--border-color);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .profile-name {
+            margin-left: 12px;
             font-size: 18px;
+            font-weight: 500;
             background: var(--text-gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
-        /* Блок нейросети */
+        /* AI Block */
         .ai-block {
-            padding: 15px;
-            margin-bottom: 20px;
-            background: var(--purple-gradient);
+            padding: 16px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(70, 30, 120, 0.6), rgba(40, 20, 80, 0.8));
         }
 
         .ai-title {
             font-size: 16px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .ai-input-container {
@@ -110,13 +133,18 @@
 
         .ai-input {
             flex: 1;
-            padding: 10px 15px;
-            border-radius: 20px;
+            padding: 12px 16px;
+            border-radius: 24px;
             border: none;
             background: rgba(0, 0, 0, 0.3);
             color: white;
             font-size: 14px;
             outline: none;
+            transition: all 0.3s;
+        }
+
+        .ai-input:focus {
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .ai-input::placeholder {
@@ -124,51 +152,55 @@
         }
 
         .ai-send-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: var(--text-gradient);
             border: none;
-            margin-left: 10px;
+            margin-left: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 140, 50, 0.3);
         }
 
         .ai-send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
-        /* Блок жалобы */
+        /* Report Block */
         .report-block {
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
         .report-title {
             font-size: 16px;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .report-desc {
             font-size: 12px;
-            opacity: 0.7;
-            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .report-input-container {
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .report-input {
             flex: 1;
-            padding: 10px 15px;
-            border-radius: 20px;
+            padding: 12px 16px;
+            border-radius: 24px;
             border: none;
             background: rgba(0, 0, 0, 0.3);
             color: white;
@@ -177,138 +209,189 @@
         }
 
         .report-submit {
-            padding: 10px 15px;
-            border-radius: 20px;
-            background: var(--button-gradient);
+            padding: 12px 16px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
             color: white;
             border: none;
-            margin-left: 10px;
+            margin-left: 8px;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
+            min-width: 80px;
+            text-align: center;
         }
 
         .report-submit:hover {
-            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 100, 100, 0.3);
         }
 
         .report-note {
-            font-size: 10px;
-            opacity: 0.5;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: center;
         }
 
-        /* Блок баланса */
+        /* Balance Block */
         .balance-label {
             font-size: 16px;
-            margin-bottom: 10px;
-            display: block;
+            margin: 16px 0 8px 8px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .balance-block {
-            padding: 15px;
-            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
         .balance-item {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
-            margin: 0 5px;
+            margin: 0 6px;
+            transition: all 0.3s;
+        }
+
+        .balance-item:active {
+            transform: scale(0.98);
         }
 
         .nova-balance {
-            background: var(--nova-gradient);
+            background: linear-gradient(135deg, rgba(30, 120, 50, 0.6), rgba(20, 80, 40, 0.8));
         }
 
         .tix-balance {
-            background: var(--tix-gradient);
+            background: linear-gradient(135deg, rgba(200, 100, 0, 0.6), rgba(160, 80, 0, 0.8));
         }
 
         .balance-amount {
-            font-size: 18px;
-            margin-top: 5px;
+            font-size: 20px;
+            font-weight: 500;
+            margin-top: 4px;
         }
 
-        /* Кнопки действий */
+        /* Action Buttons */
         .action-buttons {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+            padding: 0 8px;
         }
 
         .action-btn {
             width: 30%;
-            padding: 15px 0;
+            padding: 16px 0;
             border-radius: 12px;
-            background: var(--button-gradient);
+            background: linear-gradient(135deg, rgba(50, 50, 60, 0.6), rgba(30, 30, 40, 0.8));
             border: none;
             color: white;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .action-btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(30deg);
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .action-btn:hover::after {
+            opacity: 1;
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-10%, -10%); }
+            100% { transform: rotate(30deg) translate(10%, 10%); }
         }
 
         .action-btn:active {
-            transform: translateY(0);
+            transform: scale(0.96);
         }
 
         .action-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
+            font-size: 24px;
+            margin-bottom: 6px;
+            background: var(--text-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        /* Список участников */
+        /* Members List */
         .members-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin: 16px 8px 8px;
         }
 
         .members-title {
             font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .sort-btn {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sort-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .sort-icon {
-            margin-left: 5px;
+            margin-left: 4px;
+            font-size: 12px;
         }
 
         .members-list {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .member-card {
             display: flex;
             align-items: center;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
             transition: all 0.3s;
         }
 
-        .member-card:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .member-card:active {
+            transform: scale(0.98);
         }
 
         .member-avatar {
@@ -316,85 +399,325 @@
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 10px;
+            margin-right: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .member-info {
             flex: 1;
+            min-width: 0;
         }
 
         .member-name {
             font-size: 14px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .member-username {
             font-size: 12px;
-            opacity: 0.5;
+            color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .member-balance {
             display: flex;
+            margin-left: 8px;
         }
 
         .balance-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 12px;
-            margin-left: 5px;
-            opacity: 0.8;
+            font-weight: 500;
+            margin-left: 6px;
+            min-width: 50px;
+            text-align: center;
         }
 
         .nova-badge {
-            background: rgba(45, 90, 49, 0.3);
+            background: rgba(50, 150, 50, 0.2);
+            color: #4caf50;
         }
 
         .tix-badge {
-            background: rgba(138, 91, 42, 0.3);
+            background: rgba(200, 120, 0, 0.2);
+            color: #ff9800;
         }
 
-        /* Нижнее меню */
+        /* Bottom Menu */
         .bottom-menu {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 10px 20px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
-            background: var(--card-gradient);
-            border-top: 1px solid var(--border-color);
+            background: rgba(20, 20, 30, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
         }
 
         .menu-btn {
             background: none;
             border: none;
-            color: white;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 12px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 5px 10px;
-            opacity: 0.7;
+            padding: 4px 8px;
+            border-radius: 8px;
             transition: all 0.3s;
+            min-width: 60px;
         }
 
         .menu-btn.active {
-            opacity: 1;
-            color: #da8e36;
-        }
-
-        .menu-btn:hover {
-            opacity: 1;
+            color: #ff8a3d;
+            background: rgba(255, 140, 50, 0.1);
         }
 
         .menu-icon {
             font-size: 20px;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
-        /* Анимации */
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 16px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: white;
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Gift Modal */
+        .gift-member {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gift-member:active {
+            transform: scale(0.98);
+        }
+
+        .gift-member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .gift-member-info {
+            flex: 1;
+        }
+
+        .gift-member-name {
+            font-size: 14px;
+            color: white;
+        }
+
+        .gift-member-username {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Send Gift Modal */
+        .currency-selector {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .currency-option {
+            flex: 1;
+            padding: 12px;
+            margin: 0 4px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .currency-option.active {
+            box-shadow: 0 0 0 2px rgba(255, 140, 50, 0.5);
+        }
+
+        .currency-option:active {
+            transform: scale(0.98);
+        }
+
+        .gift-amount-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .gift-amount-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .gift-currency-display {
+            margin-left: 8px;
+            font-size: 20px;
+            font-weight: 500;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Shop */
+        .shop-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .shop-item:active {
+            transform: scale(0.98);
+        }
+
+        .shop-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .shop-item-info {
+            flex: 1;
+        }
+
+        .shop-item-name {
+            font-size: 14px;
+            color: white;
+        }
+
+        .shop-item-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .shop-item-price {
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: rgba(255, 140, 50, 0.2);
+            color: #ff8a3d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Featured items */
+        .featured-item {
+            border: 1px solid rgba(255, 140, 50, 0.3);
+            background: linear-gradient(135deg, rgba(255, 100, 50, 0.1), rgba(255, 140, 50, 0.05));
+        }
+
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -414,56 +737,29 @@
             animation: pulse 0.3s ease;
         }
 
-        /* Модальные окна */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--card-gradient);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            position: relative;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            opacity: 0.7;
-        }
-
-        .close-modal:hover {
-            opacity: 1;
+        /* Responsive */
+        @media (max-width: 400px) {
+            .balance-amount {
+                font-size: 18px;
+            }
+            .action-btn {
+                padding: 12px 0;
+            }
+            .action-icon {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Шапка профиля -->
+        <!-- Profile Header -->
         <div class="profile-header glass fade-in">
-            <img src="https://via.placeholder.com/50" alt="Аватар" class="profile-avatar" id="user-avatar">
+            <img src="" alt="Аватар" class="profile-avatar" id="user-avatar">
             <div class="profile-name" id="username">Загрузка...</div>
         </div>
 
-        <!-- Блок нейросети -->
+        <!-- AI Block -->
         <div class="ai-block glass fade-in">
             <div class="ai-title">Нейросеть GPT-4o</div>
             <div class="ai-input-container">
@@ -474,7 +770,7 @@
             </div>
         </div>
 
-        <!-- Блок жалобы -->
+        <!-- Report Block -->
         <div class="report-block glass fade-in">
             <div class="report-title">Пожаловаться на игрока</div>
             <div class="report-desc">Отправь ссылку на сообщение с нарушением. ИИ проверит его и даст тебе 6000❇️</div>
@@ -485,20 +781,20 @@
             <div class="report-note">Жалоба стоит 5000❇️. Если нарушение подтвердится, получишь 120% (6000❇️)</div>
         </div>
 
-        <!-- Блок баланса -->
+        <!-- Balance Block -->
         <div class="balance-label">Баланс</div>
         <div class="balance-block glass fade-in">
-            <div class="balance-item nova-balance">
+            <div class="balance-item nova-balance" id="nova-balance-btn">
                 <div>$NOVA</div>
                 <div class="balance-amount" id="nova-balance">0❇️</div>
             </div>
-            <div class="balance-item tix-balance">
+            <div class="balance-item tix-balance" id="tix-balance-btn">
                 <div>$TIX</div>
                 <div class="balance-amount" id="tix-balance">0✴️</div>
             </div>
         </div>
 
-        <!-- Кнопки действий -->
+        <!-- Action Buttons -->
         <div class="action-buttons fade-in">
             <button class="action-btn pulse" id="exchange-btn">
                 <span class="action-icon">⇄</span>
@@ -514,7 +810,7 @@
             </button>
         </div>
 
-        <!-- Список участников -->
+        <!-- Members List -->
         <div class="members-header">
             <div class="members-title">Участники</div>
             <button class="sort-btn" id="sort-btn">
@@ -523,102 +819,421 @@
             </button>
         </div>
         <div class="members-list" id="members-list">
-            <!-- Участники будут добавляться сюда через JS -->
+            <!-- Members will be loaded here -->
         </div>
     </div>
 
-    <!-- Нижнее меню -->
+    <!-- Bottom Menu -->
     <div class="bottom-menu glass">
-        <button class="menu-btn active">
+        <button class="menu-btn active" data-page="main">
             <span class="menu-icon">🏠</span>
             Главная
         </button>
-        <button class="menu-btn">
+        <button class="menu-btn" data-page="ai">
             <span class="menu-icon">🤖</span>
             Нейросети
         </button>
-        <button class="menu-btn">
+        <button class="menu-btn" data-page="map">
             <span class="menu-icon">🗺️</span>
             StarMap
         </button>
-        <button class="menu-btn">
+        <button class="menu-btn" data-page="shop">
             <span class="menu-icon">🛍️</span>
             Магазин
         </button>
     </div>
 
-    <!-- Модальное окно для подарка -->
+    <!-- Gift Modal -->
     <div class="modal-overlay" id="gift-modal">
-        <div class="modal-content">
+        <div class="modal-content glass">
             <button class="close-modal" id="close-gift-modal">×</button>
-            <h3>Выберите участника</h3>
-            <input type="text" placeholder="Поиск..." class="ai-input" id="member-search" style="width: 100%; margin: 10px 0;">
-            <div id="members-modal-list" style="max-height: 300px; overflow-y: auto;">
-                <!-- Список участников для выбора -->
+            <div class="modal-title">Выберите участника</div>
+            <input type="text" placeholder="Поиск..." class="ai-input" id="member-search" style="width: 100%; margin-bottom: 16px;">
+            <div id="members-modal-list">
+                <!-- Members for gifting -->
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для отправки подарка -->
+    <!-- Send Gift Modal -->
     <div class="modal-overlay" id="send-gift-modal">
-        <div class="modal-content">
+        <div class="modal-content glass">
             <button class="close-modal" id="close-send-gift-modal">×</button>
-            <div style="display: flex; margin-bottom: 15px;">
-                <div class="balance-item nova-balance" style="flex: 1; margin-right: 5px;" id="select-nova">
-                    <div>Ваши NOVA</div>
+            <div class="modal-title">Отправить подарок</div>
+            
+            <div class="currency-selector">
+                <div class="currency-option nova-balance active" id="select-nova">
+                    <div>$NOVA</div>
                     <div class="balance-amount" id="modal-nova-balance">0❇️</div>
                 </div>
-                <div class="balance-item tix-balance" style="flex: 1; margin-left: 5px;" id="select-tix">
-                    <div>Ваши TIX</div>
+                <div class="currency-option tix-balance" id="select-tix">
+                    <div>$TIX</div>
                     <div class="balance-amount" id="modal-tix-balance">0✴️</div>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                <input type="number" placeholder="Сумма" class="ai-input" id="gift-amount" style="flex: 1;">
-                <div style="margin-left: 10px; font-size: 20px;" id="gift-currency">❇️</div>
+            
+            <div class="gift-amount-container">
+                <input type="number" placeholder="Сумма" class="gift-amount-input" id="gift-amount">
+                <div class="gift-currency-display" id="gift-currency">❇️</div>
             </div>
-            <button class="report-submit" style="width: 100%;" id="send-gift-btn">Отправить</button>
+            
+            <button class="modal-btn" id="send-gift-btn">Отправить</button>
+        </div>
+    </div>
+
+    <!-- Exchange Modal -->
+    <div class="modal-overlay" id="exchange-modal">
+        <div class="modal-content glass">
+            <button class="close-modal" id="close-exchange-modal">×</button>
+            <div class="modal-title">Обмен валют</div>
+            
+            <div class="currency-selector">
+                <div class="currency-option nova-balance active" id="exchange-from-nova">
+                    <div>У меня</div>
+                    <div class="balance-amount">$NOVA</div>
+                </div>
+                <div class="currency-option tix-balance" id="exchange-from-tix">
+                    <div>У меня</div>
+                    <div class="balance-amount">$TIX</div>
+                </div>
+            </div>
+            
+            <div class="gift-amount-container" style="margin-bottom: 8px;">
+                <input type="number" placeholder="Сумма" class="gift-amount-input" id="exchange-amount">
+                <div class="gift-currency-display" id="exchange-from-currency">❇️</div>
+            </div>
+            
+            <div style="text-align: center; margin: 12px 0; font-size: 24px;">↓</div>
+            
+            <div class="gift-amount-container" style="margin-bottom: 16px;">
+                <input type="text" readonly class="gift-amount-input" id="exchange-result">
+                <div class="gift-currency-display" id="exchange-to-currency">✴️</div>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 16px; font-size: 12px; color: rgba(255,255,255,0.6);">
+                Курс: 10000❇️ = 1✴️
+            </div>
+            
+            <button class="modal-btn" id="exchange-submit-btn">Обменять</button>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div class="modal-overlay" id="shop-modal">
+        <div class="modal-content glass">
+            <button class="close-modal" id="close-shop-modal">×</button>
+            <div class="modal-title">Магазин</div>
+            
+            <div style="margin-bottom: 16px;">
+                <div style="font-size: 14px; color: #ff8a3d; margin-bottom: 8px;">Лимитированные товары</div>
+                <div id="featured-items">
+                    <!-- Featured items will be loaded here -->
+                </div>
+            </div>
+            
+            <div style="font-size: 14px; color: white; margin: 16px 0 8px;">Основные товары</div>
+            <div id="regular-items">
+                <!-- Regular items will be loaded here -->
+            </div>
         </div>
     </div>
 
     <script>
-        // Данные пользователя (в реальности будут получаться из API)
-        const userData = {
-            username: "Иван Иванов",
-            avatar: "https://via.placeholder.com/50",
-            nova: 15000,
-            tix: 350
+        // Telegram WebApp integration
+        const tg = window.Telegram.WebApp;
+        
+        // User data from Telegram
+        let userData = {
+            id: tg.initDataUnsafe.user?.id || 0,
+            firstName: tg.initDataUnsafe.user?.first_name || 'Гость',
+            lastName: tg.initDataUnsafe.user?.last_name || '',
+            username: tg.initDataUnsafe.user?.username || '',
+            photoUrl: tg.initDataUnsafe.user?.photo_url || 'https://via.placeholder.com/50',
+            nova: 0,
+            tix: 0
         };
 
-        // Список участников (в реальности будет из API)
-        const members = [
-            { id: 1, name: "Алексей Петров", username: "@alex", avatar: "https://via.placeholder.com/40", nova: 12000, tix: 420 },
-            { id: 2, name: "Мария Сидорова", username: "@mary", avatar: "https://via.placeholder.com/40", nova: 8500, tix: 210 },
-            { id: 3, name: "Дмитрий Иванов", username: "@dima", avatar: "https://via.placeholder.com/40", nova: 23000, tix: 750 },
-            { id: 4, name: "Елена Смирнова", username: "@lena", avatar: "https://via.placeholder.com/40", nova: 5000, tix: 90 },
-            { id: 5, name: "Сергей Кузнецов", username: "@serg", avatar: "https://via.placeholder.com/40", nova: 18000, tix: 530 }
+        // Members data
+        let members = [];
+        
+        // Shop items
+        const shopItems = [
+            // Featured items (limited)
+            {
+                id: 'featured_silence',
+                name: 'Тишина!',
+                description: 'На 5 минут всем участникам группы (кроме админов) запрещается отправлять сообщения',
+                price: 120000,
+                currency: 'nova',
+                featured: true
+            },
+            {
+                id: 'featured_slowmode',
+                name: 'Задержка!',
+                description: 'На 15 минут у всех появляется медленный режим отправки сообщений 30 секунд',
+                price: 160000,
+                currency: 'nova',
+                featured: true
+            },
+            {
+                id: 'featured_change_title',
+                name: 'Измени название!',
+                description: 'Измени название группы хауса на 30 минут на любое слово',
+                price: 190000,
+                currency: 'nova',
+                featured: true
+            },
+            {
+                id: 'featured_change_photo',
+                name: 'Измени фото!',
+                description: 'Измени фото группы хауса на 30 минут на любое фото (в рамках правил хауса)',
+                price: 200000,
+                currency: 'nova',
+                featured: true
+            },
+            {
+                id: 'featured_intern',
+                name: 'Стань стажером!',
+                description: 'Получи роль Стажера-администратора',
+                price: 250000,
+                currency: 'nova',
+                featured: true
+            },
+            {
+                id: 'featured_roulette',
+                name: 'Безумная рулетка!',
+                description: 'С шансом 50% ты можешь удвоить потраченную сумму (получить 280000 ❇️), но с тем же шансом ты можешь потерять 25% от новакоинов',
+                price: 140000,
+                currency: 'nova',
+                featured: true
+            },
+            
+            // Regular items
+            {
+                id: 'create_polls',
+                name: 'Создание опросов',
+                description: 'Возможность создавать опросы в группе хауса',
+                price: 20000,
+                currency: 'nova',
+                featured: false
+            },
+            {
+                id: 'custom_title',
+                name: 'Кастомное звание',
+                description: 'Собственное звание в чате без админских прав',
+                price: 50000,
+                currency: 'nova',
+                featured: false
+            },
+            {
+                id: 'random_nova',
+                name: 'Случайные новакоины',
+                description: 'Получи случайное количество $NOVA (от 10000 до 120000)',
+                price: 50000,
+                currency: 'nova',
+                featured: false
+            },
+            {
+                id: 'lite_roulette',
+                name: 'Безумная рулетка (Lite)',
+                description: 'С шансом 50% ты можешь удвоить потраченную сумму (получить 140000 ❇️), но с тем же шансом ты можешь потерять 10% от новакоинов',
+                price: 70000,
+                currency: 'nova',
+                featured: false
+            },
+            
+            // Currency packs
+            {
+                id: 'nova_10k',
+                name: '10000❇️',
+                description: 'Пополнить баланс новакоинов',
+                price: 29.99,
+                currency: 'rub',
+                featured: false
+            },
+            {
+                id: 'nova_25k',
+                name: '25000❇️',
+                description: 'Пополнить баланс новакоинов',
+                price: 69.99,
+                currency: 'rub',
+                featured: false
+            },
+            {
+                id: 'nova_50k',
+                name: '50000❇️',
+                description: 'Пополнить баланс новакоинов',
+                price: 129.99,
+                currency: 'rub',
+                featured: false
+            },
+            {
+                id: 'tix_10',
+                name: '10✴️',
+                description: 'Пополнить баланс тиксов',
+                price: 29.99,
+                currency: 'rub',
+                featured: false
+            },
+            {
+                id: 'tix_25',
+                name: '25✴️',
+                description: 'Пополнить баланс тиксов',
+                price: 69.99,
+                currency: 'rub',
+                featured: false
+            },
+            {
+                id: 'tix_50',
+                name: '50✴️',
+                description: 'Пополнить баланс тиксов',
+                price: 129.99,
+                currency: 'rub',
+                featured: false
+            }
         ];
 
-        // Инициализация данных
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Заполняем данные пользователя
-            document.getElementById('user-avatar').src = userData.avatar;
-            document.getElementById('username').textContent = userData.username;
-            document.getElementById('nova-balance').textContent = userData.nova + '❇️';
-            document.getElementById('tix-balance').textContent = userData.tix + '✴️';
-            document.getElementById('modal-nova-balance').textContent = userData.nova + '❇️';
-            document.getElementById('modal-tix-balance').textContent = userData.tix + '✴️';
+            // Expand the WebApp to full view
+            tg.expand();
+            
+            // Load user data
+            loadUserData();
+            
+            // Load members list
+            loadMembers();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
 
-            // Заполняем список участников
-            renderMembersList(members);
+        // Load user data from backend
+        function loadUserData() {
+            // In production, this would be an API call
+            console.log("Loading user data for ID:", userData.id);
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Update user data
+                userData.nova = 150000;
+                userData.tix = 35;
+                
+                // Update UI
+                updateUserUI();
+            }, 500);
+        }
 
-            // Обработчик ввода в поле нейросети
+        // Load members list from backend
+        function loadMembers() {
+            // In production, this would be an API call to get group members
+            console.log("Loading members list");
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Generate mock members
+                members = [
+                    {
+                        id: 1,
+                        firstName: "Алексей",
+                        lastName: "Петров",
+                        username: "alex",
+                        photoUrl: "https://via.placeholder.com/40/4caf50/ffffff?text=AP",
+                        nova: 12000,
+                        tix: 42
+                    },
+                    {
+                        id: 2,
+                        firstName: "Мария",
+                        lastName: "Сидорова",
+                        username: "mary",
+                        photoUrl: "https://via.placeholder.com/40/ff9800/ffffff?text=MS",
+                        nova: 8500,
+                        tix: 21
+                    },
+                    {
+                        id: 3,
+                        firstName: "Дмитрий",
+                        lastName: "Иванов",
+                        username: "dima",
+                        photoUrl: "https://via.placeholder.com/40/2196f3/ffffff?text=DI",
+                        nova: 23000,
+                        tix: 75
+                    },
+                    {
+                        id: 4,
+                        firstName: "Елена",
+                        lastName: "Смирнова",
+                        username: "lena",
+                        photoUrl: "https://via.placeholder.com/40/e91e63/ffffff?text=ES",
+                        nova: 5000,
+                        tix: 9
+                    },
+                    {
+                        id: 5,
+                        firstName: "Сергей",
+                        lastName: "Кузнецов",
+                        username: "serg",
+                        photoUrl: "https://via.placeholder.com/40/9c27b0/ffffff?text=SK",
+                        nova: 18000,
+                        tix: 53
+                    }
+                ];
+                
+                // Update UI
+                updateMembersUI();
+            }, 800);
+        }
+
+        // Update user UI with current data
+        function updateUserUI() {
+            document.getElementById('user-avatar').src = userData.photoUrl;
+            document.getElementById('username').textContent = 
+                userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
+            
+            document.getElementById('nova-balance').textContent = userData.nova.toLocaleString() + '❇️';
+            document.getElementById('tix-balance').textContent = userData.tix.toLocaleString() + '✴️';
+            
+            document.getElementById('modal-nova-balance').textContent = userData.nova.toLocaleString() + '❇️';
+            document.getElementById('modal-tix-balance').textContent = userData.tix.toLocaleString() + '✴️';
+        }
+
+        // Update members list UI
+        function updateMembersUI() {
+            const membersList = document.getElementById('members-list');
+            membersList.innerHTML = '';
+            
+            members.forEach(member => {
+                const memberCard = document.createElement('div');
+                memberCard.className = 'member-card glass fade-in';
+                
+                const fullName = member.firstName + (member.lastName ? ' ' + member.lastName : '');
+                const username = member.username ? '@' + member.username : '';
+                
+                memberCard.innerHTML = `
+                    <img src="${member.photoUrl}" alt="Аватар" class="member-avatar">
+                    <div class="member-info">
+                        <div class="member-name">${fullName}</div>
+                        <div class="member-username">${username}</div>
+                    </div>
+                    <div class="member-balance">
+                        <div class="balance-badge nova-badge">${member.nova.toLocaleString()}❇️</div>
+                        <div class="balance-badge tix-badge">${member.tix.toLocaleString()}✴️</div>
+                    </div>
+                `;
+                
+                membersList.appendChild(memberCard);
+            });
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // AI input
             document.getElementById('ai-input').addEventListener('input', function() {
                 const sendBtn = document.getElementById('ai-send-btn');
                 sendBtn.disabled = this.value.trim() === '';
             });
-
-            // Обработчик отправки в нейросеть
+            
             document.getElementById('ai-send-btn').addEventListener('click', function() {
                 const input = document.getElementById('ai-input');
                 if (input.value.trim() !== '') {
@@ -627,123 +1242,361 @@
                     this.disabled = true;
                 }
             });
-
-            // Обработчик жалобы
+            
+            // Report submit
             document.getElementById('report-submit').addEventListener('click', function() {
                 const reportInput = document.getElementById('report-input');
                 if (reportInput.value.trim() === '') {
                     alert('Введите ссылку на сообщение');
                     return;
                 }
-
-                // Симуляция отправки жалобы
+                
+                // Simulate API call
                 const reportBlock = document.querySelector('.report-block');
-                reportBlock.innerHTML = '<div style="padding: 20px; text-align: center;">✅ Готово! Сообщили администраторам и вернули тебе 6000❇️ на баланс</div>';
+                reportBlock.innerHTML = `
+                    <div style="padding: 20px; text-align: center; animation: fadeIn 0.3s ease-out;">
+                        ✅ Готово! Сообщили администраторам и вернули тебе 6000❇️ на баланс
+                    </div>
+                `;
                 
                 setTimeout(() => {
-                    location.reload(); // В реальности нужно будет обновить только блок жалобы
+                    location.reload();
                 }, 5000);
             });
-
-            // Обработчики кнопок действий
-            document.getElementById('exchange-btn').addEventListener('click', function() {
-                alert('Функция обмена будет реализована позже');
+            
+            // Action buttons
+            document.getElementById('exchange-btn').addEventListener('click', openExchangeModal);
+            document.getElementById('buy-btn').addEventListener('click', openShopModal);
+            document.getElementById('gift-btn').addEventListener('click', openGiftModal);
+            
+            // Balance buttons
+            document.getElementById('nova-balance-btn').addEventListener('click', function() {
+                this.classList.add('pulse');
+                setTimeout(() => this.classList.remove('pulse'), 300);
             });
-
-            document.getElementById('buy-btn').addEventListener('click', function() {
-                alert('Функция покупки будет реализована позже');
+            
+            document.getElementById('tix-balance-btn').addEventListener('click', function() {
+                this.classList.add('pulse');
+                setTimeout(() => this.classList.remove('pulse'), 300);
             });
-
-            document.getElementById('gift-btn').addEventListener('click', function() {
-                openGiftModal();
+            
+            // Sort button
+            document.getElementById('sort-btn').addEventListener('click', function() {
+                alert('Функция сортировки будет реализована позже');
             });
-
-            // Модальное окно подарка
+            
+            // Bottom menu
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.classList.contains('active')) return;
+                    
+                    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.getAttribute('data-page');
+                    alert(`Переход на страницу: ${page}`);
+                });
+            });
+            
+            // Gift modals
             document.getElementById('close-gift-modal').addEventListener('click', closeGiftModal);
             document.getElementById('close-send-gift-modal').addEventListener('click', closeSendGiftModal);
             document.getElementById('send-gift-btn').addEventListener('click', sendGift);
-
-            // Выбор валюты для подарка
+            
+            // Currency selection
             document.getElementById('select-nova').addEventListener('click', function() {
+                document.getElementById('select-nova').classList.add('active');
+                document.getElementById('select-tix').classList.remove('active');
                 document.getElementById('gift-currency').textContent = '❇️';
             });
-
+            
             document.getElementById('select-tix').addEventListener('click', function() {
+                document.getElementById('select-tix').classList.add('active');
+                document.getElementById('select-nova').classList.remove('active');
                 document.getElementById('gift-currency').textContent = '✴️';
             });
-        });
-
-        // Функция отображения списка участников
-        function renderMembersList(members) {
-            const membersList = document.getElementById('members-list');
-            membersList.innerHTML = '';
-
-            members.forEach(member => {
-                const memberCard = document.createElement('div');
-                memberCard.className = 'member-card glass fade-in';
-                memberCard.innerHTML = `
-                    <img src="${member.avatar}" alt="Аватар" class="member-avatar">
-                    <div class="member-info">
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-username">${member.username}</div>
-                    </div>
-                    <div class="member-balance">
-                        <div class="balance-badge nova-badge">${member.nova}❇️</div>
-                        <div class="balance-badge tix-badge">${member.tix}✴️</div>
-                    </div>
-                `;
-                membersList.appendChild(memberCard);
+            
+            // Exchange modals
+            document.getElementById('close-exchange-modal').addEventListener('click', closeExchangeModal);
+            document.getElementById('exchange-submit-btn').addEventListener('click', exchangeCurrency);
+            
+            document.getElementById('exchange-from-nova').addEventListener('click', function() {
+                document.getElementById('exchange-from-nova').classList.add('active');
+                document.getElementById('exchange-from-tix').classList.remove('active');
+                document.getElementById('exchange-from-currency').textContent = '❇️';
+                document.getElementById('exchange-to-currency').textContent = '✴️';
+                calculateExchange();
             });
+            
+            document.getElementById('exchange-from-tix').addEventListener('click', function() {
+                document.getElementById('exchange-from-tix').classList.add('active');
+                document.getElementById('exchange-from-nova').classList.remove('active');
+                document.getElementById('exchange-from-currency').textContent = '✴️';
+                document.getElementById('exchange-to-currency').textContent = '❇️';
+                calculateExchange();
+            });
+            
+            document.getElementById('exchange-amount').addEventListener('input', calculateExchange);
+            
+            // Shop modal
+            document.getElementById('close-shop-modal').addEventListener('click', closeShopModal);
         }
 
-        // Функции для работы с модальными окнами
+        // Gift modal functions
         function openGiftModal() {
-            document.getElementById('gift-modal').style.display = 'flex';
-            const modalList = document.getElementById('members-modal-list');
-            modalList.innerHTML = '';
-
+            const modal = document.getElementById('gift-modal');
+            const membersList = document.getElementById('members-modal-list');
+            
+            membersList.innerHTML = '';
+            
             members.forEach(member => {
+                if (member.id === userData.id) return; // Skip self
+                
                 const memberItem = document.createElement('div');
-                memberItem.className = 'member-card';
+                memberItem.className = 'gift-member glass';
+                
+                const fullName = member.firstName + (member.lastName ? ' ' + member.lastName : '');
+                const username = member.username ? '@' + member.username : '';
+                
                 memberItem.innerHTML = `
-                    <img src="${member.avatar}" alt="Аватар" class="member-avatar">
-                    <div class="member-info">
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-username">${member.username}</div>
+                    <img src="${member.photoUrl}" alt="Аватар" class="gift-member-avatar">
+                    <div class="gift-member-info">
+                        <div class="gift-member-name">${fullName}</div>
+                        <div class="gift-member-username">${username}</div>
                     </div>
                 `;
+                
                 memberItem.addEventListener('click', () => {
                     closeGiftModal();
                     openSendGiftModal(member);
                 });
-                modalList.appendChild(memberItem);
+                
+                membersList.appendChild(memberItem);
             });
+            
+            modal.classList.add('show');
         }
 
         function closeGiftModal() {
-            document.getElementById('gift-modal').style.display = 'none';
+            document.getElementById('gift-modal').classList.remove('show');
         }
 
         function openSendGiftModal(member) {
-            document.getElementById('send-gift-modal').style.display = 'flex';
-            // Здесь можно добавить данные о получателе
+            const modal = document.getElementById('send-gift-modal');
+            modal.classList.add('show');
+            
+            // Here you would store the selected member for sending the gift
+            modal.setAttribute('data-member-id', member.id);
         }
 
         function closeSendGiftModal() {
-            document.getElementById('send-gift-modal').style.display = 'none';
+            document.getElementById('send-gift-modal').classList.remove('show');
         }
 
         function sendGift() {
-            const amount = document.getElementById('gift-amount').value;
+            const modal = document.getElementById('send-gift-modal');
+            const amount = parseInt(document.getElementById('gift-amount').value);
             const currency = document.getElementById('gift-currency').textContent;
+            const memberId = modal.getAttribute('data-member-id');
             
-            if (!amount || isNaN(amount) || parseInt(amount) <= 0) {
+            if (!amount || isNaN(amount) || amount <= 0) {
                 alert('Введите корректную сумму');
                 return;
             }
-
-            alert(`Вы подарили ${amount}${currency}!`);
+            
+            // Find member
+            const member = members.find(m => m.id == memberId);
+            if (!member) {
+                alert('Ошибка: участник не найден');
+                return;
+            }
+            
+            // Check balance
+            if (currency === '❇️' && amount > userData.nova) {
+                alert('Недостаточно новакоинов');
+                return;
+            }
+            
+            if (currency === '✴️' && amount > userData.tix) {
+                alert('Недостаточно тиксов');
+                return;
+            }
+            
+            // In production, this would be an API call
+            alert(`Вы подарили ${amount}${currency} пользователю ${member.firstName}!`);
+            
+            // Update UI (simulated)
+            if (currency === '❇️') {
+                userData.nova -= amount;
+            } else {
+                userData.tix -= amount;
+            }
+            updateUserUI();
+            
             closeSendGiftModal();
+        }
+
+        // Exchange modal functions
+        function openExchangeModal() {
+            const modal = document.getElementById('exchange-modal');
+            modal.classList.add('show');
+            calculateExchange();
+        }
+
+        function closeExchangeModal() {
+            document.getElementById('exchange-modal').classList.remove('show');
+        }
+
+        function calculateExchange() {
+            const amount = parseFloat(document.getElementById('exchange-amount').value) || 0;
+            const fromNova = document.getElementById('exchange-from-nova').classList.contains('active');
+            
+            if (fromNova) {
+                // NOVA to TIX
+                const result = amount / 10000;
+                document.getElementById('exchange-result').value = result.toFixed(4);
+            } else {
+                // TIX to NOVA
+                const result = amount * 10000;
+                document.getElementById('exchange-result').value = result.toLocaleString();
+            }
+        }
+
+        function exchangeCurrency() {
+            const amount = parseFloat(document.getElementById('exchange-amount').value) || 0;
+            const fromNova = document.getElementById('exchange-from-nova').classList.contains('active');
+            
+            if (amount <= 0) {
+                alert('Введите корректную сумму');
+                return;
+            }
+            
+            if (fromNova) {
+                // NOVA to TIX
+                if (amount > userData.nova) {
+                    alert('Недостаточно новакоинов');
+                    return;
+                }
+                
+                const result = amount / 10000;
+                userData.nova -= amount;
+                userData.tix += result;
+            } else {
+                // TIX to NOVA
+                if (amount > userData.tix) {
+                    alert('Недостаточно тиксов');
+                    return;
+                }
+                
+                const result = amount * 10000;
+                userData.tix -= amount;
+                userData.nova += result;
+            }
+            
+            alert('Обмен выполнен успешно!');
+            updateUserUI();
+            closeExchangeModal();
+        }
+
+        // Shop modal functions
+        function openShopModal() {
+            const modal = document.getElementById('shop-modal');
+            const featuredItems = document.getElementById('featured-items');
+            const regularItems = document.getElementById('regular-items');
+            
+            // Clear previous items
+            featuredItems.innerHTML = '';
+            regularItems.innerHTML = '';
+            
+            // Add featured items
+            shopItems.filter(item => item.featured).forEach(item => {
+                const shopItem = createShopItemElement(item);
+                featuredItems.appendChild(shopItem);
+            });
+            
+            // Add regular items
+            shopItems.filter(item => !item.featured).forEach(item => {
+                const shopItem = createShopItemElement(item);
+                regularItems.appendChild(shopItem);
+            });
+            
+            modal.classList.add('show');
+        }
+
+        function closeShopModal() {
+            document.getElementById('shop-modal').classList.remove('show');
+        }
+
+        function createShopItemElement(item) {
+            const shopItem = document.createElement('div');
+            shopItem.className = `shop-item glass ${item.featured ? 'featured-item' : ''}`;
+            shopItem.setAttribute('data-item-id', item.id);
+            
+            const priceText = item.currency === 'rub' ? 
+                `${item.price.toLocaleString()}₽` : 
+                `${item.price.toLocaleString()}${item.currency === 'nova' ? '❇️' : '✴️'}`;
+            
+            shopItem.innerHTML = `
+                <div class="shop-item-icon">${item.featured ? '🌟' : '🛒'}</div>
+                <div class="shop-item-info">
+                    <div class="shop-item-name">${item.name}</div>
+                    <div class="shop-item-desc">${item.description}</div>
+                </div>
+                <div class="shop-item-price">${priceText}</div>
+            `;
+            
+            shopItem.addEventListener('click', () => {
+                purchaseItem(item);
+            });
+            
+            return shopItem;
+        }
+
+        function purchaseItem(item) {
+            if (item.currency === 'nova' && item.price > userData.nova) {
+                alert('Недостаточно новакоинов');
+                return;
+            }
+            
+            if (item.currency === 'tix' && item.price > userData.tix) {
+                alert('Недостаточно тиксов');
+                return;
+            }
+            
+            // In production, this would be an API call
+            if (item.currency === 'rub') {
+                alert(`Покупка ${item.name} за ${item.price}₽. В реальном приложении будет открыта платежная система.`);
+            } else {
+                if (item.currency === 'nova') {
+                    userData.nova -= item.price;
+                } else {
+                    userData.tix -= item.price;
+                }
+                
+                // Apply item effect
+                if (item.id === 'random_nova') {
+                    const randomNova = Math.floor(10000 + Math.random() * 110000);
+                    userData.nova += randomNova;
+                    alert(`Вы получили ${randomNova.toLocaleString()}❇️!`);
+                } else if (item.id === 'lite_roulette' || item.id === 'featured_roulette') {
+                    const isWin = Math.random() > 0.5;
+                    if (isWin) {
+                        const winAmount = item.id === 'lite_roulette' ? 140000 : 280000;
+                        userData.nova += winAmount;
+                        alert(`Поздравляем! Вы выиграли ${winAmount.toLocaleString()}❇️!`);
+                    } else {
+                        const loseAmount = item.id === 'lite_roulette' ? 
+                            Math.floor(userData.nova * 0.1) : 
+                            Math.floor(userData.nova * 0.25);
+                        userData.nova -= loseAmount;
+                        alert(`К сожалению, вы потеряли ${loseAmount.toLocaleString()}❇️. Попробуйте ещё раз!`);
+                    }
+                } else {
+                    alert(`Вы приобрели "${item.name}". В реальном приложении бот выдаст вам этот товар в группе.`);
+                }
+                
+                updateUserUI();
+            }
         }
     </script>
 </body>

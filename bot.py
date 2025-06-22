@@ -4,81 +4,106 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import (
-    Message,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    WebAppInfo
-)
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
+from dotenv import load_dotenv
+import sqlite3
+import json
 
-# Настройка логирования
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+# Load environment
+load_dotenv()
 
-# Конфигурация
-TOKEN = os.getenv("TOKEN")
-GROUP_ID = int(os.getenv("GROUP_ID", "-4641203188"))
+# Database setup
+def init_db():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        nova_balance INTEGER DEFAULT 0,
+        tix_balance INTEGER DEFAULT 0,
+        avatar_color TEXT DEFAULT 'orange'
+    )
+    ''')
+    
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        amount INTEGER,
+        currency TEXT,
+        type TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    
+    conn.commit()
+    conn.close()
 
-# Инициализация бота (новая версия aiogram 3.0.0rc2)
-bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
+init_db()
+
+# Bot setup
+bot = Bot(token=os.getenv("TOKEN"), parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 @dp.message(Command('start'))
 async def cmd_start(message: Message):
+    user = message.from_user
+    save_user(user)
+    
     try:
-        user = message.from_user
-        logger.info(f"User {user.id} started bot")
-        
-        # Проверяем членство в группе
-        try:
-            chat_member = await bot.get_chat_member(GROUP_ID, user.id)
-            if chat_member.status not in ['member', 'administrator', 'creator']:
-                await message.reply("❌ Доступ только для участников группы!")
-                return
-        except Exception as group_error:
-            logger.error(f"Group check error: {group_error}")
-            await message.reply("⚠️ Ошибка проверки доступа")
+        chat_member = await bot.get_chat_member(os.getenv("GROUP_ID"), user.id)
+        if chat_member.status not in ['member', 'administrator', 'creator']:
+            await message.reply("❌ Доступ только для участников группы!")
             return
-
-        # Создаем кнопку с WebApp
-        keyboard = types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    types.InlineKeyboardButton(
-                        text="🌟 Открыть Stargram",
-                        web_app=types.WebAppInfo(url="https://mattway231.github.io/Stargram/")
-                    )
-                ]
-            ]
-        )
-        
-        await message.reply(
-            f"✅ <b>Добро пожаловать, {user.first_name}!</b>\n"
-            "Доступ к Stargram разрешен!",
-            reply_markup=keyboard
-        )
-
     except Exception as e:
-        logger.error(f"Error: {e}", exc_info=True)
-        await message.reply("⚠️ Произошла ошибка. Попробуйте позже.")
+        logging.error(f"Group check error: {e}")
+        await message.reply("⚠️ Ошибка проверки доступа")
+        return
 
-async def handle(request):
-    return web.Response(text="Bot is running")
+    webapp_url = f"{os.getenv('WEBAPP_URL')}?user_id={user.id}"
+    
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🌟 Открыть Stargram",
+                    web_app=WebAppInfo(url=webapp_url)
+                )
+            ]
+        ]
+    )
+    
+    await message.reply(
+        f"✅ <b>Добро пожаловать, {user.first_name}!</b>\n"
+        "Доступ к Stargram разрешен!",
+        reply_markup=keyboard
+    )
 
-app = web.Application()
-app.add_routes([web.get('/', handle)])
+def save_user(user):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+    INSERT OR IGNORE INTO users (id, username, first_name, last_name)
+    VALUES (?, ?, ?, ?)
+    ''', (user.id, user.username, user.first_name, user.last_name))
+    
+    conn.commit()
+    conn.close()
+
+async def on_startup(bot: Bot):
+    await bot.set_webhook(os.getenv("WEBHOOK_URL"))
+
+async def main():
+    await bot.delete_webhook()
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    # Запускаем бота и сервер в одном event loop
-    async def run():
-        runner = web.AppRunner(app)
-        await runner.setup()
-        site = web.TCPSite(runner, '0.0.0.0', 8080)
-        await site.start()
-        await dp.start_polling(bot)
-    
-    asyncio.run(run())
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())

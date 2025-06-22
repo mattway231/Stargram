@@ -2,68 +2,214 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stargram</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        @font-face {
-            font-family: 'Benzin';
-            src: url('fonts/Benzin-Bold.woff2') format('woff2'),
-                 url('fonts/Benzin-Medium.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <!-- Главный контейнер -->
     <div class="app-container">
-        <!-- Фон с эффектом жидкого стекла -->
-        <div class="liquid-glass"></div>
-        
-        <!-- Шапка -->
+        <!-- Шапка с балансом и пользователем -->
         <header class="app-header">
-            <div class="user-card">
-                <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-profile">
+                <div class="user-avatar" id="user-avatar"></div>
                 <div class="user-info">
-                    <h2 id="username">Загрузка...</h2>
-                    <p id="user-balance">0❇️ | 0✴️</p>
+                    <div class="user-name" id="user-name"></div>
+                    <div class="user-status" id="user-status"></div>
+                </div>
+            </div>
+            <div class="user-balance">
+                <div class="balance-item nova">
+                    <span class="balance-icon">❇️</span>
+                    <span id="nova-balance">0</span>
+                </div>
+                <div class="balance-item tix">
+                    <span class="balance-icon">✴️</span>
+                    <span id="tix-balance">0</span>
                 </div>
             </div>
         </header>
 
         <!-- Основное содержимое -->
         <main class="app-content" id="app-content">
-            <!-- Контент будет подгружаться динамически -->
+            <!-- Контент будет динамически подгружаться -->
         </main>
 
-        <!-- Навигация -->
-        <nav class="app-nav">
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
             <button class="nav-btn active" data-page="home">
-                <svg><!-- Иконка дома --></svg>
+                <svg class="nav-icon"><use href="#icon-home"/></svg>
                 <span>Главная</span>
             </button>
             <button class="nav-btn" data-page="ai">
-                <svg><!-- Иконка AI --></svg>
+                <svg class="nav-icon"><use href="#icon-ai"/></svg>
                 <span>Нейросети</span>
             </button>
             <button class="nav-btn" data-page="map">
-                <svg><!-- Иконка карты --></svg>
+                <svg class="nav-icon"><use href="#icon-map"/></svg>
                 <span>Карта</span>
             </button>
             <button class="nav-btn" data-page="shop">
-                <svg><!-- Иконка магазина --></svg>
+                <svg class="nav-icon"><use href="#icon-shop"/></svg>
                 <span>Магазин</span>
             </button>
         </nav>
-    </div>
 
-    <!-- Модальные окна -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <div id="modal-body"></div>
+        <!-- SVG иконки -->
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="icon-home" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <path d="M9 22V12h6v10"/>
+            </symbol>
+            <symbol id="icon-ai" viewBox="0 0 24 24">
+                <path d="M9 17c0 1.66 1.34 3 3 3s3-1.34 3-3"/>
+                <path d="M12 20v-4"/>
+                <path d="M8 14v-1c0-1.66 1.34-3 3-3h2c1.66 0 3 1.34 3 3v1"/>
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="5" r="3"/>
+            </symbol>
+            <symbol id="icon-map" viewBox="0 0 24 24">
+                <path d="M9 19l-6 2V5l6-2"/>
+                <path d="M15 5l6-2v16l-6 2"/>
+                <path d="M9 3v16"/>
+                <path d="M15 7v16"/>
+            </symbol>
+            <symbol id="icon-shop" viewBox="0 0 24 24">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+            </symbol>
+            <symbol id="icon-send" viewBox="0 0 24 24">
+                <path d="M22 2L11 13"/>
+                <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+            </symbol>
+            <symbol id="icon-exchange" viewBox="0 0 24 24">
+                <path d="M17 3l4 4-4 4"/>
+                <path d="M7 21l-4-4 4-4"/>
+                <path d="M21 7H3v4"/>
+                <path d="M3 17h18v-4"/>
+            </symbol>
+        </svg>
+
+        <!-- Модальные окна -->
+        <div class="modal-overlay" id="modal-overlay"></div>
+
+        <!-- Модалка обмена -->
+        <div class="modal" id="exchange-modal">
+            <div class="modal-header">
+                <h3>Обмен валют</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="exchange-rate">
+                    10000❇️ = 1✴️
+                </div>
+                <div class="currency-selector">
+                    <button class="currency-option active" data-from="nova">
+                        <span class="currency-name">NOVA</span>
+                        <span class="currency-balance" id="modal-nova-balance">0❇️</span>
+                    </button>
+                    <button class="currency-option" data-from="tix">
+                        <span class="currency-name">TIX</span>
+                        <span class="currency-balance" id="modal-tix-balance">0✴️</span>
+                    </button>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="exchange-amount" placeholder="Сумма" class="glass-input">
+                    <span class="currency-symbol" id="exchange-from-symbol">❇️</span>
+                </div>
+                <div class="exchange-result">
+                    <span>Вы получите:</span>
+                    <span id="exchange-result-value">0</span>
+                    <span id="exchange-to-symbol">✴️</span>
+                </div>
+                <button class="primary-btn" id="confirm-exchange">Обменять</button>
+            </div>
+        </div>
+
+        <!-- Модалка подарка -->
+        <div class="modal" id="gift-modal">
+            <div class="modal-header">
+                <h3>Отправить подарок</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <input type="text" id="member-search" placeholder="Поиск участников..." class="glass-input">
+                <div class="members-list" id="members-modal-list">
+                    <!-- Список участников -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Модалка подтверждения подарка -->
+        <div class="modal" id="confirm-gift-modal">
+            <div class="modal-header">
+                <h3>Отправить подарок</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="recipient-info">
+                    <div class="user-avatar" id="gift-recipient-avatar"></div>
+                    <div class="recipient-name" id="gift-recipient-name"></div>
+                </div>
+                <div class="currency-selector">
+                    <button class="currency-option active" data-currency="nova">
+                        <span class="currency-name">NOVA</span>
+                        <span class="currency-balance" id="gift-nova-balance">0❇️</span>
+                    </button>
+                    <button class="currency-option" data-currency="tix">
+                        <span class="currency-name">TIX</span>
+                        <span class="currency-balance" id="gift-tix-balance">0✴️</span>
+                    </button>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="gift-amount" placeholder="Сумма" class="glass-input">
+                    <span class="currency-symbol" id="gift-currency-symbol">❇️</span>
+                </div>
+                <button class="primary-btn" id="confirm-gift">Отправить</button>
+            </div>
+        </div>
+
+        <!-- Модалка магазина -->
+        <div class="modal wide-modal" id="shop-modal">
+            <div class="modal-header">
+                <h3>Магазин</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="shop-tabs">
+                    <button class="shop-tab active" data-tab="items">Товары</button>
+                    <button class="shop-tab" data-tab="currency">Валюта</button>
+                </div>
+                <div class="shop-content active" id="shop-items-content">
+                    <!-- Товары будут загружены динамически -->
+                </div>
+                <div class="shop-content" id="shop-currency-content">
+                    <!-- Валюта будет загружена динамически -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Модалка карты -->
+        <div class="modal full-height-modal" id="map-modal">
+            <div class="modal-header">
+                <h3>StarMap</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div id="map-container"></div>
+                <div class="map-controls">
+                    <button class="map-control-btn" id="refresh-points">
+                        <svg class="control-icon"><use href="#icon-refresh"/></svg>
+                        <span>Обновить</span>
+                    </button>
+                    <button class="map-control-btn" id="my-location">
+                        <svg class="control-icon"><use href="#icon-location"/></svg>
+                        <span>Моё место</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

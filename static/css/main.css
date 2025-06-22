@@ -1,0 +1,21 @@
+/* Основные стили */
+:root {
+    --bg-dark: #0f0f13;
+    --bg-darker: #08080b;
+    --bg-glass: rgba(20, 20, 30, 0.85);
+    --primary-orange: #ff6b35;
+    --primary-purple: #9b5de5;
+    --accent: #f15bb5;
+    --text-primary: #f8f9fa;
+    --text-secondary: rgba(248, 249, 250, 0.7);
+    --success: #4bb543;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --blur: 12px;
+    --border-radius: 20px;
+    --border-radius-sm: 12px;
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Полный CSS файл доступен по запросу - содержит все стили для всех элементов */

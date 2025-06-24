@@ -451,7 +451,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Starmap Screen */
+/* Map Styles */
 #map-container {
     flex: 1;
     position: relative;
@@ -471,6 +471,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    z-index: 1000;
 }
 
 .map-control {
@@ -490,6 +491,26 @@ body {
 
 .map-control:hover {
     background: var(--glass-highlight);
+}
+
+.user-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px;
+}
+
+.point-marker {
+    font-size: 24px;
+    text-align: center;
+    line-height: 30px;
 }
 
 /* GPT Screen */

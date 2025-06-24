@@ -1,15 +1,16 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext, CallbackQueryHandler
+from flask import Flask, request, jsonify
 from config import Config
 import database as db
-import integrations as intg
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+import os
+import pytz
 from datetime import datetime, timedelta
 import random
-import pytz
-import asyncio
 
-# Initialize database
-db.init_app(Config)
+app = Flask(_name_)
+app.config.from_object(Config)
+db.init_app(app)
 
 async def start(update: Update, context: CallbackContext):
     user = update.effective_user

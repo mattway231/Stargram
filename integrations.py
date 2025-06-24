@@ -71,10 +71,6 @@ class OpenRouterAPI:
         
         response = requests.post(self.API_URL, headers=self.HEADERS, json=data)
         return response.json()
-    
-    def get_models(self):
-        response = requests.get("https://openrouter.ai/api/v1/models", headers=self.HEADERS)
-        return response.json()
 
 class CozeAPI:
     def __init__(self):
@@ -107,7 +103,7 @@ class CozeAPI:
             return "approve" if "approve" in content.lower() else "reject"
         return "reject"
 
-class OpenStreetMap:
+class MapService:
     @staticmethod
     def get_address(lat, lng):
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lng}"

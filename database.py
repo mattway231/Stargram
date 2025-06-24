@@ -14,7 +14,7 @@ class User(db.Model):
     hide_balance = db.Column(db.Boolean, default=False)
     language = db.Column(db.String(2), default='ru')
     share_location = db.Column(db.Boolean, default=False)
-    visible_to = db.Column(db.String, default='all')  # 'all', 'friends', 'none'
+    visible_to = db.Column(db.String, default='all')
     last_active = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
@@ -81,3 +81,8 @@ class GPTMessage(db.Model):
     role = db.Column(db.String(10), nullable=False)  # 'user' or 'assistant'
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+def init_app(config):
+    db.init_app(config)
+    with config.app_context():
+        db.create_all()

@@ -1,140 +1,144 @@
-import httpx
-import random
-from geopy.geocoders import Nominatim
-from geopy.distance import geodesic
+import requests
+import json
+import time
 from config import Config
 
-class AIService:
-    @staticmethod
-    async def check_violation(text: str) -> bool:
-        """Проверка сообщения на нарушения через Coze API"""
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://api.coze.com/v1/moderate",
-                headers={"Authorization": f"Bearer {Config.COOZE_API_KEY}"},
-                json={"text": text}
-            )
-            return response.json().get("result") == "approve"
-    
-    @staticmethod
-    async def generate_text(prompt: str) -> str:
-        """Генерация текста через OpenRouter"""
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
-                    "HTTP-Referer": Config.WEBAPP_URL
-                },
-                json={
-                    "model": "google/gemma-7b-it:free",
-                    "messages": [{"role": "user", "content": prompt}]
-                }
-            )
-            return response.json()["choices"][0]["message"]["content"]
-    
-    @staticmethod
-    async def generate_image(prompt: str) -> str:
-        """Генерация изображения через FusionBrain"""
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://api.fusionbrain.ai/v1/text2image/run",
-                headers={"Authorization": f"Bearer {Config.FUSIONBRAIN_API_KEY}"},
-                json={"text": prompt}
-            )
-            return response.json()["images"][0]
-
-class MapService:
+class FusionBrainAPI:
     def __init__(self):
-        self.geolocator = Nominatim(user_agent="stargram", timeout=10)
-
-    async def generate_points(self, user_id: int, lat: float, lon: float) -> list:
-        """Генерация случайных точек в парках/аллеях"""
-        async with AsyncSessionLocal() as session:
-            # Получаем город пользователя
-            user = await session.get(User, user_id)
-            if not user.city:
-                location = await self.geolocator.reverse((lat, lon))
-                user.city = location.raw.get('address', {}).get('city', 'Unknown')
-                user.country = location.raw.get('address', {}).get('country', 'Unknown')
-                await session.commit()
-
-            # Запрос к Overpass API для поиска парков
-            query = f"""
-            [out:json];
-            (
-              way["leisure"="park"](around:5000,{lat},{lon});
-              way["landuse"="recreation_ground"](around:5000,{lat},{lon});
-              way["leisure"="garden"](around:5000,{lat},{lon});
-            );
-            out body;
-            >;
-            out skel qt;
-            """
-            
-            async with httpx.AsyncClient() as client:
-                response = await client.get(Config.OVERPASS_URL, params={'data': query})
-                data = response.json()
-                
-                points = []
-                for element in data.get('elements', []):
-                    if element['type'] == 'way':
-                        # Генерация случайной точки внутри полигона
-                        point = self._random_point_in_polygon(element['nodes'])
-                        address = await self._reverse_geocode(point)
-                        
-                        points.append(MapPoint(
-                            lat=point[0],
-                            lon=point[1],
-                            address=address,
-                            reward=random.randint(Config.MIN_POINT_REWARD, Config.MAX_POINT_REWARD),
-                            user_id=user_id
-                        ))
-                
-                # Сохраняем точки в БД
-                session.add_all(points)
-                await session.commit()
-                
-                return points
-
-    def _random_point_in_polygon(self, polygon):
-        """Генерация случайной точки внутри полигона"""
-        min_lat = min(p[0] for p in polygon)
-        max_lat = max(p[0] for p in polygon)
-        min_lon = min(p[1] for p in polygon)
-        max_lon = max(p[1] for p in polygon)
+        self.URL = "https://api-key.fusionbrain.ai/"
+        self.AUTH_HEADERS = {
+            'X-Key': f'Key {Config.FUSIONBRAIN_API_KEY}',
+            'X-Secret': f'Secret {Config.FUSIONBRAIN_API_KEY}',
+        }
         
-        while True:
-            lat = random.uniform(min_lat, max_lat)
-            lon = random.uniform(min_lon, max_lon)
-            
-            if self._point_in_polygon((lat, lon), polygon):
-                return (lat, lon)
-
-    def _point_in_polygon(self, point, polygon):
-        """Проверка точки внутри полигона"""
-        x, y = point
-        inside = False
-        n = len(polygon)
+    def get_pipeline(self):
+        response = requests.get(self.URL + 'key/api/v1/pipelines', headers=self.AUTH_HEADERS)
+        data = response.json()
+        return data[0]['id']
+    
+    def generate(self, prompt, pipeline, style="DEFAULT", width=1024, height=1024, negative_prompt="", images=1):
+        params = {
+            "type": "GENERATE",
+            "style": style,
+            "numImages": images,
+            "width": width,
+            "height": height,
+            "negativePromptDecoder": negative_prompt,
+            "generateParams": {
+                "query": prompt
+            }
+        }
         
-        p1x, p1y = polygon[0]
-        for i in range(n + 1):
-            p2x, p2y = polygon[i % n]
-            if y > min(p1y, p2y):
-                if y <= max(p1y, p2y):
-                    if x <= max(p1x, p2x):
-                        if p1y != p2y:
-                            xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
-                        if p1x == p2x or x <= xinters:
-                            inside = not inside
-            p1x, p1y = p2x, p2y
+        data = {
+            'pipeline_id': (None, pipeline),
+            'params': (None, json.dumps(params), 'application/json')
+        }
         
-        return inside
+        response = requests.post(self.URL + 'key/api/v1/pipeline/run', 
+                               headers=self.AUTH_HEADERS, 
+                               files=data)
+        data = response.json()
+        return data['uuid']
+    
+    def check_generation(self, request_id, attempts=10, delay=10):
+        while attempts > 0:
+            response = requests.get(self.URL + 'key/api/v1/pipeline/status/' + request_id, 
+                                  headers=self.AUTH_HEADERS)
+            data = response.json()
+            if data['status'] == 'DONE':
+                return data['result']['files']
+            attempts -= 1
+            time.sleep(delay)
+        return None
 
-    async def _reverse_geocode(self, point):
-        """Определение адреса по координатам"""
-        try:
-            location = await self.geolocator.reverse(point)
-            return location.address
-        except:
-            return f"{point[0]:.4f}, {point[1]:.4f}"
+class OpenRouterAPI:
+    def __init__(self):
+        self.API_URL = "https://openrouter.ai/api/v1/chat/completions"
+        self.HEADERS = {
+            "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
+            "HTTP-Referer": Config.WEBAPP_URL,
+            "X-Title": "Stargram",
+            "Content-Type": "application/json"
+        }
+    
+    def chat_completion(self, messages, model="deepseek/deepseek-v3-base:free", temperature=0.7, max_tokens=2000):
+        data = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens
+        }
+        
+        response = requests.post(self.API_URL, headers=self.HEADERS, json=data)
+        return response.json()
+    
+    def get_models(self):
+        response = requests.get("https://openrouter.ai/api/v1/models", headers=self.HEADERS)
+        return response.json()
+
+class CozeAPI:
+    def __init__(self):
+        self.API_URL = "https://api.coze.com/v3/chat"
+        self.HEADERS = {
+            "Authorization": f"Bearer {Config.COEZ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        self.BOT_ID = "7518741050719633464"
+    
+    def check_complaint(self, user_id, message_text):
+        data = {
+            "bot_id": self.BOT_ID,
+            "user_id": str(user_id),
+            "stream": False,
+            "additional_messages": [
+                {
+                    "role": "user",
+                    "content": message_text,
+                    "content_type": "text"
+                }
+            ]
+        }
+        
+        response = requests.post(self.API_URL, headers=self.HEADERS, json=data)
+        result = response.json()
+        
+        if 'choices' in result and len(result['choices']) > 0:
+            content = result['choices'][0]['message']['content']
+            return "approve" if "approve" in content.lower() else "reject"
+        return "reject"
+
+class OpenStreetMap:
+    @staticmethod
+    def get_address(lat, lng):
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lng}"
+        response = requests.get(url)
+        data = response.json()
+        
+        if 'address' in data:
+            address = data.get('display_name', '')
+            return address
+        return ""
+
+    @staticmethod
+    def get_parks_nearby(lat, lng, radius=5000):
+        url = f"https://overpass-api.de/api/interpreter"
+        query = f"""
+        [out:json];
+        (
+          way["leisure"="park"](around:{radius},{lat},{lng});
+          relation["leisure"="park"](around:{radius},{lat},{lng});
+        );
+        out center;
+        """
+        response = requests.get(url, params={'data': query})
+        data = response.json()
+        
+        parks = []
+        for element in data.get('elements', []):
+            if 'center' in element:
+                parks.append({
+                    'lat': element['center']['lat'],
+                    'lng': element['center']['lon'],
+                    'name': element.get('tags', {}).get('name', 'Park')
+                })
+        return parks

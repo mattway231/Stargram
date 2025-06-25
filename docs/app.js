@@ -1,61 +1,134 @@
-// Initialize map with Leaflet.js
-function initMap() {
-    if (map) return;
+document.addEventListener('DOMContentLoaded', async () => {
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.expand();
     
-    map = L.map('map').setView([55.7558, 37.6173], 12);
+    // Получение токена пользователя
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    
-    // Add user marker if location is available
-    if (userLocation) {
-        updateUserLocation(userLocation.lat, userLocation.lng);
+    // Проверка авторизации
+    if (!token) {
+        showAuthScreen();
+        return;
     }
     
-    // Load points
-    loadPoints();
-}
-
-// Update user location on map
-function updateUserLocation(lat, lng) {
-    userLocation = { lat, lng };
-    
-    if (map) {
-        if (userMarker) {
-            userMarker.setLatLng([lat, lng]);
-        } else {
-            userMarker = L.marker([lat, lng], {
-                icon: L.divIcon({
-                    className: 'user-marker',
-                    html: `<div class="avatar-marker">${currentUser.username.charAt(0).toUpperCase()}</div>`,
-                    iconSize: [40, 40]
-                })
-            }).addTo(map);
+    try {
+        const decoded = jwt_decode(token);
+        const user = await getUserData(decoded.user_id);
+        
+        if (!user) {
+            showAuthScreen();
+            return;
         }
         
-        // Center map on user
-        map.setView([lat, lng], 13);
+        initApp(user);
+    } catch (e) {
+        showAuthScreen();
+    }
+    
+    // Инициализация карты
+    const map = L.map('map').setView([55.751244, 37.618423], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+});
+
+async function getUserData(userId) {
+    try {
+        const response = await fetch(`${config.API_URL}/user?user_id=${userId}`);
+        return await response.json();
+    } catch (e) {
+        return null;
     }
 }
 
-// Load points on map
-function loadPoints() {
-    // Clear existing points
-    pointMarkers.forEach(marker => map.removeLayer(marker));
-    pointMarkers = [];
+function initApp(user) {
+    // Обновление UI
+    document.getElementById('nova-balance').textContent = `${user.nova}❇️`;
+    document.getElementById('tix-balance').textContent = `${user.tix}✴️`;
     
-    // Add new points
-    activePoints.forEach(point => {
-        const marker = L.marker([point.latitude, point.longitude], {
-            icon: L.divIcon({
-                className: 'point-marker',
-                html: '📍',
-                iconSize: [30, 30]
-            })
-        }).addTo(map);
-        
-        marker.on('click', () => showPointDetails(point));
-        pointMarkers.push(marker);
+    // Премиум статус
+    if (user.is_premium) {
+        document.querySelector('.avatar').classList.add('premium');
+        document.getElementById('premium-banner').style.display = 'none';
+    }
+    
+    // Обработчики вкладок
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Переключение экранов
+            const tabName = tab.dataset.tab;
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-screen`).classList.remove('hidden');
+        });
     });
+    
+    // Закрытие премиум баннера
+    document.querySelector('.close-banner').addEventListener('click', () => {
+        document.getElementById('premium-banner').style.display = 'none';
+    });
+    
+    // Генерация точек на карте
+    if (user.allow_location) {
+        generateMapPoints(user);
+    }
+}
+
+function generateMapPoints(user) {
+    // Запрос геопозиции
+    navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        
+        // Центрирование карты
+        map.setView([lat, lon], 13);
+        
+        // Генерация точек
+        const points = integrations.GeoAPI.generate_points(lat, lon);
+        
+        points.forEach(point => {
+            const marker = L.marker([point[0], point[1]]).addTo(map)
+                .bindPopup(`<b>Точка сбора</b><br>${point[2]}<br>Награда: ${point[3]}❇️`);
+            
+            marker.on('click', () => {
+                collectPoint(user.id, point);
+            });
+        });
+        
+        // Отображение друзей
+        user.friends.forEach(friend => {
+            if (friend.location) {
+                L.marker([friend.location.lat, friend.location.lon])
+                    .addTo(map)
+                    .bindPopup(`<b>${friend.username}</b>`);
+            }
+        });
+    });
+}
+
+async function collectPoint(userId, point) {
+    try {
+        const response = await fetch(`${config.API_URL}/collect-point`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: userId,
+                lat: point[0],
+                lon: point[1],
+                value: point[3]
+            })
+        });
+        
+        if (response.ok) {
+            alert(`Точка собрана! +${point[3]}❇️`);
+        }
+    } catch (e) {
+        console.error('Ошибка сбора точки:', e);
+    }
 }

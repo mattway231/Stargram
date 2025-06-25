@@ -1,841 +1,136 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stargram</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
-<body>
-    <div id="app">
-        <!-- Onboarding Screens -->
-        <div id="onboarding" class="screen">
-            <div class="onboarding-container">
-                <img id="onboarding-image" src="" alt="Onboarding">
-                <div class="onboarding-footer">
-                    <div class="onboarding-progress">
-                        <div class="progress-dot active"></div>
-                        <div class="progress-dot"></div>
-                        <div class="progress-dot"></div>
-                        <div class="progress-dot"></div>
-                    </div>
-                    <button id="next-button" class="btn-primary">Дальше</button>
-                </div>
-            </div>
-        </div>
+import requests
+import config
+from datetime import datetime
 
-        <!-- Paywall Screen -->
-        <div id="paywall" class="screen hidden">
-            <div class="paywall-container">
-                <h2>Stargram Plus</h2>
-                <p>Откройте все возможности приложения с премиум подпиской</p>
-                
-                <div class="premium-benefits">
-                    <div class="benefit">
-                        <div class="benefit-icon">🟣</div>
-                        <div class="benefit-text">Эксклюзивный значок и обводка</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">💰</div>
-                        <div class="benefit-text">+50% к наградам за активность</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">📍</div>
-                        <div class="benefit-text">Больше точек на карте и +20% к наградам</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">👀</div>
-                        <div class="benefit-text">Видимость всех участников на карте</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">⚡</div>
-                        <div class="benefit-text">Приоритет в очередях нейросетей</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">🛒</div>
-                        <div class="benefit-text">Скидка 10% в магазинах</div>
-                    </div>
-                    <div class="benefit">
-                        <div class="benefit-icon">🚨</div>
-                        <div class="benefit-text">Бесплатные жалобы</div>
-                    </div>
-                </div>
-                
-                <div class="pricing-options">
-                    <div class="pricing-option" data-months="1">
-                        <div class="option-header">
-                            <h3>1 месяц</h3>
-                            <div class="price">149₽</div>
-                        </div>
-                    </div>
-                    <div class="pricing-option" data-months="3">
-                        <div class="option-header">
-                            <h3>3 месяца</h3>
-                            <div class="price">399₽ <span class="savings">(~11%)</span></div>
-                        </div>
-                    </div>
-                    <div class="pricing-option" data-months="6">
-                        <div class="option-header">
-                            <h3>6 месяцев</h3>
-                            <div class="price">699₽ <span class="savings">(~22%)</span></div>
-                        </div>
-                    </div>
-                    <div class="pricing-option" data-months="12">
-                        <div class="option-header">
-                            <h3>12 месяцев</h3>
-                            <div class="price">1199₽ <span class="savings">(~33%)</span></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button id="buy-premium" class="btn-premium">Купить Stargram Plus</button>
-                <button id="close-paywall" class="btn-secondary">Продолжить бесплатно</button>
-            </div>
-        </div>
-
-        <!-- Main App -->
-        <div id="main-app" class="screen hidden">
-            <!-- Header -->
-            <header class="app-header">
-                <div class="header-left">
-                    <div id="user-avatar" class="avatar"></div>
-                </div>
-                <div class="header-center">
-                    <h1 id="app-title">Stargram</h1>
-                </div>
-                <div class="header-right">
-                    <button id="settings-button" class="icon-button">⚙️</button>
-                </div>
-            </header>
-
-            <!-- Main Content -->
-            <main class="app-content">
-                <!-- Home Screen -->
-                <div id="home-screen" class="content-screen">
-                    <div class="balance-card">
-                        <div class="balance-amount">
-                            <span class="currency-icon">❇️</span>
-                            <span id="nova-balance">0</span>
-                        </div>
-                        <div class="balance-amount">
-                            <span class="currency-icon">✴️</span>
-                            <span id="tix-balance">0</span>
-                        </div>
-                    </div>
-
-                    <div class="quick-actions">
-                        <button id="quick-complaint" class="quick-action">
-                            <div class="action-icon">🚨</div>
-                            <div class="action-label">Жалоба</div>
-                        </button>
-                        <button id="quick-shop" class="quick-action">
-                            <div class="action-icon">🛒</div>
-                            <div class="action-label">Магазин</div>
-                        </button>
-                        <button id="quick-exchange" class="quick-action">
-                            <div class="action-icon">💱</div>
-                            <div class="action-label">Обмен</div>
-                        </button>
-                        <button id="quick-gift" class="quick-action">
-                            <div class="action-icon">🎁</div>
-                            <div class="action-label">Подарок</div>
-                        </button>
-                    </div>
-
-                    <div class="features-grid">
-                        <button id="feature-starmap" class="feature-card">
-                            <div class="feature-icon">🗺️</div>
-                            <div class="feature-title">Starmap</div>
-                            <div class="feature-subtitle">Собирай точки</div>
-                        </button>
-                        <button id="feature-gpt" class="feature-card">
-                            <div class="feature-icon">🤖</div>
-                            <div class="feature-title">GPT-4o</div>
-                            <div class="feature-subtitle">Бесплатный чат</div>
-                        </button>
-                        <button id="feature-ai-image" class="feature-card">
-                            <div class="feature-icon">🎨</div>
-                            <div class="feature-title">YaART</div>
-                            <div class="feature-subtitle">Генерация изображений</div>
-                        </button>
-                        <button id="feature-members" class="feature-card">
-                            <div class="feature-icon">👥</div>
-                            <div class="feature-title">Участники</div>
-                            <div class="feature-subtitle">Список группы</div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Starmap Screen -->
-              <div id="starmap-screen" class="content-screen hidden">
-                    <div id="map-container">
-                        <div id="map"></div>
-                        <div class="map-controls">
-                            <button id="map-locate" class="map-control">📍</button>
-                            <button id="map-points-list" class="map-control">📋</button>
-                            <button id="map-members" class="map-control">👥</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- GPT Screen -->
-                <div id="gpt-screen" class="content-screen hidden">
-                    <div class="gpt-conversations">
-                        <button id="new-chat" class="btn-primary">+ Новый чат</button>
-                        <div id="conversations-list" class="conversations-list"></div>
-                    </div>
-                    <div class="gpt-chat">
-                        <div id="chat-messages" class="chat-messages"></div>
-                        <div class="chat-input-container">
-                            <textarea id="chat-input" placeholder="Напишите сообщение..."></textarea>
-                            <button id="send-message" class="btn-primary">➤</button>
-                        </div>
-                        <div class="chat-options">
-                            <label class="option-switch">
-                                <input type="checkbox" id="thinking-mode">
-                                <span class="slider"></span>
-                                <span class="option-label">Режим мышления</span>
-                            </label>
-                            <label class="option-switch">
-                                <input type="checkbox" id="web-search">
-                                <span class="slider"></span>
-                                <span class="option-label">Поиск в интернете</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Image Screen -->
-                <div id="ai-image-screen" class="content-screen hidden">
-                    <div class="ai-image-controls">
-                        <div class="control-group">
-                            <label for="image-prompt">Промпт</label>
-                            <textarea id="image-prompt" placeholder="Опишите изображение..."></textarea>
-                        </div>
-                        <div class="control-group">
-                            <label for="negative-prompt">Негативный промпт</label>
-                            <textarea id="negative-prompt" placeholder="Чего не должно быть..."></textarea>
-                        </div>
-                        <div class="control-group">
-                            <label for="image-style">Стиль</label>
-                            <select id="image-style">
-                                <option value="DEFAULT">Свой стиль</option>
-                                <option value="KANDINSKY">Кандинский</option>
-                                <option value="UHD">Детальное фото</option>
-                                <option value="ANIME">Аниме</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label for="image-ratio">Соотношение сторон</label>
-                            <select id="image-ratio">
-                                <option value="1:1">1:1 (Квадрат)</option>
-                                <option value="2:3">2:3 (Портрет)</option>
-                                <option value="3:2">3:2 (Альбом)</option>
-                                <option value="9:16">9:16 (Вертикальный)</option>
-                                <option value="16:9">16:9 (Горизонтальный)</option>
-                            </select>
-                        </div>
-                        <button id="generate-image" class="btn-primary">Сгенерировать (1✴️)</button>
-                    </div>
-                    <div id="generated-image-container" class="generated-image-container">
-                        <div class="placeholder">Здесь появится ваше изображение</div>
-                        <img id="generated-image" class="hidden" alt="Сгенерированное изображение">
-                    </div>
-                </div>
-
-                <!-- Members Screen -->
-                <div id="members-screen" class="content-screen hidden">
-                    <div class="search-container">
-                        <input type="text" id="member-search" placeholder="Поиск участников...">
-                    </div>
-                    <div id="members-list" class="members-list"></div>
-                </div>
-
-                <!-- Complaint Screen -->
-                <div id="complaint-screen" class="content-screen hidden">
-                    <div class="complaint-container">
-                        <h2>Пожаловаться на сообщение</h2>
-                        <p>Введите ссылку на сообщение из группы, которое содержит нарушение:</p>
-                        <input type="text" id="complaint-link" placeholder="https://t.me/...">
-                        <p class="small-text">Стоимость жалобы: 5000❇️ (Премиум: бесплатно)</p>
-                        <p class="small-text">При одобрении жалобы вы получите 6000❇️ (120% возврат)</p>
-                        <button id="submit-complaint" class="btn-primary">Отправить жалобу</button>
-                    </div>
-                </div>
-
-                <!-- Shop Screen -->
-                <div id="shop-screen" class="content-screen hidden">
-                    <div class="shop-tabs">
-                        <button class="shop-tab active" data-tab="currency">Валюта</button>
-                        <button class="shop-tab" data-tab="perks">Возможности</button>
-                        <button class="shop-tab" data-tab="limited">Лимитированные</button>
-                    </div>
-                    
-                    <div id="currency-shop" class="shop-content active">
-                        <h3>Купить валюту</h3>
-                        <div class="currency-options">
-                            <div class="currency-option">
-                                <div class="currency-amount">10,000❇️</div>
-                                <div class="currency-price">29,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">25,000❇️</div>
-                                <div class="currency-price">69,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">50,000❇️</div>
-                                <div class="currency-price">129,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">75,000❇️</div>
-                                <div class="currency-price">189,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">100,000❇️</div>
-                                <div class="currency-price">239,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">125,000❇️</div>
-                                <div class="currency-price">289,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">150,000❇️</div>
-                                <div class="currency-price">339,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">175,000❇️</div>
-                                <div class="currency-price">389,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">200,000❇️</div>
-                                <div class="currency-price">439,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">250,000❇️</div>
-                                <div class="currency-price">539,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">500,000❇️</div>
-                                <div class="currency-price">999,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">750,000❇️</div>
-                                <div class="currency-price">1,399,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">1,000,000❇️</div>
-                                <div class="currency-price">1,799,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">10✴️</div>
-                                <div class="currency-price">299,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">25✴️</div>
-                                <div class="currency-price">699,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">50✴️</div>
-                                <div class="currency-price">1,299,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">75✴️</div>
-                                <div class="currency-price">1,899,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">100✴️</div>
-                                <div class="currency-price">2,399,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">125✴️</div>
-                                <div class="currency-price">2,899,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">150✴️</div>
-                                <div class="currency-price">3,399,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">175✴️</div>
-                                <div class="currency-price">3,899,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">200✴️</div>
-                                <div class="currency-price">4,399,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">250✴️</div>
-                                <div class="currency-price">5,399,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">500✴️</div>
-                                <div class="currency-price">9,999,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">750✴️</div>
-                                <div class="currency-price">13,999,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="currency-option">
-                                <div class="currency-amount">1,000✴️</div>
-                                <div class="currency-price">17,999,99₽</div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="perks-shop" class="shop-content">
-                        <h3>Возможности в группе</h3>
-                        <div class="perks-list">
-                            <div class="perk-item">
-                                <div class="perk-info">
-                                    <h4>Создание опросов</h4>
-                                    <p>Возможность создавать опросы в группе</p>
-                                    <div class="perk-price">20,000❇️</div>
-                                </div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="perk-item">
-                                <div class="perk-info">
-                                    <h4>Кастомная должность</h4>
-                                    <p>Своя должность без прав на 10 дней</p>
-                                    <div class="perk-price">70,000❇️</div>
-                                </div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="perk-item">
-                                <div class="perk-info">
-                                    <h4>Случайные новакоины</h4>
-                                    <p>Получи случайное количество (10,000-90,000❇️)</p>
-                                    <div class="perk-price">50,000❇️</div>
-                                </div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                            <div class="perk-item">
-                                <div class="perk-info">
-                                    <h4>Безумная рулетка (Lite)</h4>
-                                    <p>50% удвоить сумму, 50% потерять 10% баланса</p>
-                                    <div class="perk-price">70,000❇️</div>
-                                </div>
-                                <button class="btn-small">Купить</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="limited-shop" class="shop-content">
-                        <h3>Лимитированные товары</h3>
-                        <div class="limited-time">
-                            <div class="timer">
-                                <span id="limited-hours">10</span>:<span id="limited-minutes">00</span>:<span id="limited-seconds">00</span>
-                            </div>
-                            <p>До исчезновения товара</p>
-                        </div>
-                        <div class="limited-item">
-                            <div class="limited-badge">🔥 ЛИМИТИРОВАННЫЙ</div>
-                            <div class="limited-info">
-                                <h4 id="limited-title">Тишина!</h4>
-                                <p id="limited-description">На 5 минут всем участникам группы (кроме админов) запрещается отправлять сообщения</p>
-                                <div class="limited-price">120,000❇️</div>
-                            </div>
-                            <button class="btn-premium">Купить сейчас</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Exchange Screen -->
-                <div id="exchange-screen" class="content-screen hidden">
-                    <div class="exchange-container">
-                        <h2>Обмен валют</h2>
-                        <p>Курс: 10,000❇️ = 1✴️</p>
-                        
-                        <div class="exchange-direction">
-                            <button id="exchange-nova-to-tix" class="exchange-btn active">❇️ → ✴️</button>
-                            <button id="exchange-tix-to-nova" class="exchange-btn">✴️ → ❇️</button>
-                        </div>
-                        
-                        <div class="exchange-input">
-                            <input type="number" id="exchange-amount" placeholder="0">
-                            <span id="exchange-from">❇️</span>
-                        </div>
-                        
-                        <div class="exchange-result">
-                            <span id="exchange-result-amount">0</span>
-                            <span id="exchange-to">✴️</span>
-                        </div>
-                        
-                        <button id="perform-exchange" class="btn-primary">Обменять</button>
-                    </div>
-                </div>
-
-                <!-- Gift Screen -->
-                <div id="gift-screen" class="content-screen hidden">
-                    <div class="gift-container">
-                        <h2>Подарить валюту</h2>
-                        
-                        <div class="gift-recipient">
-                            <label for="gift-user">Получатель:</label>
-                            <select id="gift-user">
-                                <option value="">Выберите пользователя</option>
-                            </select>
-                        </div>
-                        
-                        <div class="gift-currency">
-                            <label>Валюта:</label>
-                            <div class="currency-options">
-                                <label>
-                                    <input type="radio" name="gift-currency" value="NOVA" checked>
-                                    <span>❇️ Новакоины</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="gift-currency" value="TIX">
-                                    <span>✴️ Тиксы</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="gift-amount">
-                            <label for="gift-amount">Количество:</label>
-                            <input type="number" id="gift-amount" placeholder="0">
-                        </div>
-                        
-                        <button id="send-gift" class="btn-primary">Отправить подарок</button>
-                    </div>
-                </div>
-
-                <!-- Points List Screen -->
-                <div id="points-list-screen" class="content-screen hidden">
-                    <div class="points-header">
-                        <h2>Точки за сегодня</h2>
-                        <div class="points-timer">
-                            До конца дня: <span id="points-timer">23:59:59</span>
-                        </div>
-                    </div>
-                    
-                    <div class="points-tabs">
-                        <button class="points-tab active" data-tab="uncollected">Не собраны</button>
-                        <button class="points-tab" data-tab="collected">Собраны</button>
-                    </div>
-                    
-                    <div id="uncollected-points" class="points-list">
-                        <!-- Points will be added here dynamically -->
-                    </div>
-                    
-                    <div id="collected-points" class="points-list hidden">
-                        <!-- Points will be added here dynamically -->
-                    </div>
-                </div>
-
-                <!-- Members Map Screen -->
-                <div id="members-map-screen" class="content-screen hidden">
-                    <div class="members-map-header">
-                        <h2>Участники</h2>
-                        <button id="add-friend" class="btn-small">+ Добавить</button>
-                    </div>
-                    
-                    <div id="members-map-list" class="members-list">
-                        <!-- Members will be added here dynamically -->
-                    </div>
-                </div>
-
-                <!-- Profile Screen -->
-                <div id="profile-screen" class="content-screen hidden">
-                    <div class="profile-header">
-                        <button id="back-to-members" class="icon-button">←</button>
-                        <h2 id="profile-username">Профиль</h2>
-                    </div>
-                    
-                    <div class="profile-content">
-                        <div class="profile-avatar-container">
-                            <div id="profile-avatar" class="avatar large"></div>
-                            <div id="profile-premium-badge" class="premium-badge hidden">🟣</div>
-                        </div>
-                        
-                        <div class="profile-info">
-                            <div class="info-row">
-                                <span class="info-label">Имя:</span>
-                                <span id="profile-name" class="info-value">...</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Юзернейм:</span>
-                                <span id="profile-username-value" class="info-value">@username</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Статус:</span>
-                                <span id="profile-status" class="info-value">Обычный</span>
-                            </div>
-                            <div id="profile-balance-row" class="info-row">
-                                <span class="info-label">Баланс:</span>
-                                <span id="profile-balance" class="info-value">0❇️, 0✴️</span>
-                            </div>
-                        </div>
-                        
-                        <div class="profile-stats">
-                            <h3>Статистика</h3>
-                            <div class="stats-grid">
-                                <div class="stat-item">
-                                    <div class="stat-value" id="stat-today">0</div>
-                                    <div class="stat-label">Сообщений сегодня</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value" id="stat-week">0</div>
-                                    <div class="stat-label">Сообщений за неделю</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value" id="stat-points-today">0</div>
-                                    <div class="stat-label">Точек сегодня</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value" id="stat-points-week">0</div>
-                                    <div class="stat-label">Точек за неделю</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings Screen -->
-                <div id="settings-screen" class="content-screen hidden">
-                    <div class="settings-header">
-                        <button id="back-to-main" class="icon-button">←</button>
-                        <h2>Настройки</h2>
-                    </div>
-                    
-                    <div class="settings-content">
-                        <div class="settings-section">
-                            <h3>Профиль</h3>
-                            <div class="setting-item">
-                                <label for="language">Язык:</label>
-                                <select id="language">
-                                    <option value="ru">Русский</option>
-                                    <option value="uk">Українська</option>
-                                    <option value="be">Беларуская</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-section">
-                            <h3>Конфиденциальность</h3>
-                            <div class="setting-item">
-                                <label class="switch">
-                                    <input type="checkbox" id="hide-balance">
-                                    <span class="slider"></span>
-                                    <span class="setting-label">Скрыть баланс от других</span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <label class="switch">
-                                    <input type="checkbox" id="share-location">
-                                    <span class="slider"></span>
-                                    <span class="setting-label">Делиться геопозицией</span>
-                                </label>
-                            </div>
-                            <div class="setting-item" id="location-visibility-item">
-                                <label for="location-visibility">Кто видит мою геопозицию:</label>
-                                <select id="location-visibility">
-                                    <option value="all">Все участники</option>
-                                    <option value="friends">Только друзья</option>
-                                    <option value="none">Никто</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-section">
-                            <h3>Уведомления</h3>
-                            <div class="setting-item">
-                                <label class="switch">
-                                    <input type="checkbox" id="notify-points" checked>
-                                    <span class="slider"></span>
-                                    <span class="setting-label">Новые точки на карте</span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <label class="switch">
-                                    <input type="checkbox" id="notify-gifts" checked>
-                                    <span class="slider"></span>
-                                    <span class="setting-label">Подарки</span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <label class="switch">
-                                    <input type="checkbox" id="notify-premium" checked>
-                                    <span class="slider"></span>
-                                    <span class="setting-label">Премиум обновления</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-section">
-                            <h3>Аккаунт</h3>
-                            <button id="logout" class="btn-secondary">Выйти</button>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Bottom Navigation -->
-            <nav class="bottom-nav">
-                <button class="nav-btn active" data-screen="home">
-                    <span class="nav-icon">🏠</span>
-                    <span class="nav-label">Главная</span>
-                </button>
-                <button class="nav-btn" data-screen="starmap">
-                    <span class="nav-icon">🗺️</span>
-                    <span class="nav-label">Starmap</span>
-                </button>
-                <button class="nav-btn" data-screen="gpt">
-                    <span class="nav-icon">🤖</span>
-                    <span class="nav-label">GPT-4o</span>
-                </button>
-                <button class="nav-btn" data-screen="ai-image">
-                    <span class="nav-icon">🎨</span>
-                    <span class="nav-label">YaART</span>
-                </button>
-                <button class="nav-btn" data-screen="members">
-                    <span class="nav-icon">👥</span>
-                    <span class="nav-label">Участники</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Modal Windows -->
-        <div id="modal-overlay" class="modal-overlay hidden"></div>
+class FusionBrainAPI:
+    def __init__(self):
+        self.URL = 'https://api-key.fusionbrain.ai/'
+        self.AUTH_HEADERS = {
+            'X-Key': f'Key {config.FUSIONBRAIN_API_KEY}',
+            'X-Secret': f'Secret {config.FUSIONBRAIN_API_KEY}',
+        }
+    
+    def get_pipeline(self):
+        response = requests.get(self.URL + 'key/api/v1/pipelines', headers=self.AUTH_HEADERS)
+        data = response.json()
+        return data[0]['id'] if data else None
+    
+    def generate(self, prompt, pipeline, style="DEFAULT", width=1024, height=1024, images=1, negative_prompt=""):
+        params = {
+            "type": "GENERATE",
+            "style": style,
+            "width": width,
+            "height": height,
+            "numImages": images,
+            "negativePromptDecoder": negative_prompt,
+            "generateParams": {
+                "query": prompt
+            }
+        }
         
-        <div id="point-modal" class="modal hidden">
-            <div class="modal-header">
-                <h3>Точка сбора</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-content">
-                <div class="point-address" id="point-address">Адрес загружается...</div>
-                <div class="point-reward" id="point-reward">Награда: ~15,000❇️</div>
-                <div class="point-distance" id="point-distance">Расстояние: 1.2 км</div>
-                <div class="point-actions">
-                    <button id="copy-address" class="btn-small">Копировать адрес</button>
-                    <button id="open-maps" class="btn-small">Открыть в картах</button>
-                    <button id="collect-point" class="btn-primary">Я у точки!</button>
-                </div>
-            </div>
-        </div>
+        data = {
+            'pipeline_id': (None, pipeline),
+            'params': (None, str(params).replace("'", '"'), 'application/json')
+        }
         
-        <div id="friend-modal" class="modal hidden">
-            <div class="modal-header">
-                <h3>Добавить в друзья</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-content">
-                <div class="search-container">
-                    <input type="text" id="friend-search" placeholder="Поиск участников...">
-                </div>
-                <div id="friend-list" class="friend-list">
-                    <!-- Friends will be added here dynamically -->
-                </div>
-            </div>
-        </div>
-        
-        <div id="premium-modal" class="modal hidden">
-            <div class="modal-header">
-                <h3>Stargram Plus</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-content">
-                <div class="premium-status">
-                    <div id="premium-active" class="hidden">
-                        <p>Ваша подписка активна до: <span id="premium-until">01.01.2025</span></p>
-                        <button id="gift-premium" class="btn-small">Подарить подписку</button>
-                    </div>
-                    <div id="premium-inactive">
-                        <p>У вас нет активной подписки Stargram Plus</p>
-                        <button id="buy-premium-modal" class="btn-premium">Купить подписку</button>
-                    </div>
-                </div>
-                <div class="premium-benefits">
-                    <h4>Преимущества подписки:</h4>
-                    <ul>
-                        <li>🟣 Эксклюзивный значок и обводка</li>
-                        <li>💰 +50% к наградам за активность</li>
-                        <li>📍 Больше точек на карте и +20% к наградам</li>
-                        <li>👀 Видимость всех участников на карте</li>
-                        <li>⚡ Приоритет в очередях нейросетей</li>
-                        <li>🛒 Скидка 10% в магазинах</li>
-                        <li>🚨 Бесплатные жалобы</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div id="gift-premium-modal" class="modal hidden">
-            <div class="modal-header">
-                <h3>Подарить подписку</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-content">
-                <div class="gift-premium-user">
-                    <label for="gift-premium-to">Получатель:</label>
-                    <select id="gift-premium-to">
-                        <option value="">Выберите пользователя</option>
-                    </select>
-                </div>
-                <div class="gift-premium-duration">
-                    <label for="gift-premium-months">Срок:</label>
-                    <select id="gift-premium-months">
-                        <option value="1">1 месяц - 149₽</option>
-                        <option value="3">3 месяца - 399₽ (~11%)</option>
-                        <option value="6">6 месяцев - 699₽ (~22%)</option>
-                        <option value="12">12 месяцев - 1199₽ (~33%)</option>
-                    </select>
-                </div>
-                <button id="confirm-gift-premium" class="btn-premium">Подарить подписку</button>
-            </div>
-        </div>
-        
-        <div id="confirmation-modal" class="modal hidden">
-            <div class="modal-header">
-                <h3 id="confirmation-title">Подтверждение</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-content">
-                <p id="confirmation-message">Вы уверены, что хотите выполнить это действие?</p>
-                <div class="confirmation-actions">
-                    <button id="confirm-cancel" class="btn-secondary">Отмена</button>
-                    <button id="confirm-ok" class="btn-primary">Подтвердить</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="loading-modal" class="modal hidden">
-            <div class="modal-content center">
-                <div class="loading-spinner"></div>
-                <p id="loading-message">Загрузка...</p>
-            </div>
-        </div>
-    </div>
+        response = requests.post(
+            self.URL + 'key/api/v1/pipeline/run', 
+            headers=self.AUTH_HEADERS, 
+            files=data
+        )
+        data = response.json()
+        return data['uuid'] if 'uuid' in data else None
+    
+    def check_generation(self, request_id, attempts=10, delay=10):
+        while attempts > 0:
+            response = requests.get(
+                self.URL + 'key/api/v1/pipeline/status/' + request_id, 
+                headers=self.AUTH_HEADERS
+            )
+            data = response.json()
+            if data['status'] == 'DONE':
+                return data['result']['files'][0] if data['result']['files'] else None
+            attempts -= 1
+            time.sleep(delay)
+        return None
 
-    <script src="app.js"></script>
-</body>
-</html>
+class OpenRouterAPI:
+    def __init__(self):
+        self.URL = 'https://openrouter.ai/api/v1/chat/completions'
+        self.HEADERS = {
+            'Authorization': f'Bearer {config.OPENROUTER_API_KEY}',
+            'HTTP-Referer': config.WEBAPP_URL,
+            'X-Title': 'Stargram'
+        }
+    
+    def chat_completion(self, messages, model="deepseek/deepseek-v3-base:free", max_tokens=2000):
+        payload = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens
+        }
+        
+        response = requests.post(self.URL, headers=self.HEADERS, json=payload)
+        data = response.json()
+        
+        if 'choices' in data and data['choices']:
+            return data['choices'][0]['message']['content']
+        return None
+
+class CozeAPI:
+    def __init__(self):
+        self.URL = 'https://api.coze.com/v3/chat'
+        self.HEADERS = {
+            'Authorization': f'Bearer {config.COZE_API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        self.BOT_ID = config.COZE_AGENT_ID
+    
+    def check_complaint(self, user_id, message_text):
+        payload = {
+            "bot_id": self.BOT_ID,
+            "user_id": str(user_id),
+            "message": {
+                "content": message_text,
+                "type": "text"
+            }
+        }
+        
+        response = requests.post(self.URL, headers=self.HEADERS, json=payload)
+        data = response.json()
+        
+        if 'output' in data and 'text' in data['output']:
+            return "approve" if "approve" in data['output']['text'].lower() else "reject"
+        return "reject"
+
+class GeoAPI:
+    @staticmethod
+    def get_address(lat, lon):
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
+        response = requests.get(url)
+        data = response.json()
+        return data.get('display_name', 'Неизвестный адрес')
+    
+    @staticmethod
+    def generate_points(lat, lon, count=5, radius=5000):
+        # Generate random points in parks near user
+        points = []
+        for _ in range(count):
+            # Simple random point generation (in real app use OSM data)
+            new_lat = lat + (random.uniform(-0.1, 0.1))
+            new_lon = lon + (random.uniform(-0.1, 0.1))
+            address = GeoAPI.get_address(new_lat, new_lon)
+            value = random.randint(10000, 25000) if random.random() > 0.5 else random.randint(20000, 35000)
+            points.append((new_lat, new_lon, address, value))
+        return points
+
+class PaymentSystem:
+    @staticmethod
+    def create_invoice(user_id, amount, currency, description):
+        # In real app integrate with payment provider
+        return f"{config.WEBAPP_URL}/payment/{user_id}/{uuid.uuid4()}"
+    
+    @staticmethod
+    def check_payment(invoice_id):
+        # In real app check payment status
+        return True

@@ -1,136 +1,72 @@
-import requests
-import config
-from datetime import datetime
-
-class FusionBrainAPI:
-    def __init__(self):
-        self.URL = 'https://api-key.fusionbrain.ai/'
-        self.AUTH_HEADERS = {
-            'X-Key': f'Key {config.FUSIONBRAIN_API_KEY}',
-            'X-Secret': f'Secret {config.FUSIONBRAIN_API_KEY}',
-        }
-    
-    def get_pipeline(self):
-        response = requests.get(self.URL + 'key/api/v1/pipelines', headers=self.AUTH_HEADERS)
-        data = response.json()
-        return data[0]['id'] if data else None
-    
-    def generate(self, prompt, pipeline, style="DEFAULT", width=1024, height=1024, images=1, negative_prompt=""):
-        params = {
-            "type": "GENERATE",
-            "style": style,
-            "width": width,
-            "height": height,
-            "numImages": images,
-            "negativePromptDecoder": negative_prompt,
-            "generateParams": {
-                "query": prompt
-            }
-        }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stargram</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Главный экран -->
+        <div id="main-screen" class="screen">
+            <div class="header">
+                <div class="user-info" id="user-header">
+                    <div class="avatar"></div>
+                    <div class="balance">
+                        <span id="nova-balance">0❇️</span>
+                        <span id="tix-balance">0✴️</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="neural">Нейросети</button>
+                <button class="tab" data-tab="starmap">Starmap</button>
+                <button class="tab" data-tab="shop">Магазин</button>
+                <button class="tab" data-tab="profile">Профиль</button>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Контент вкладок -->
+            </div>
+            
+            <div class="premium-banner" id="premium-banner">
+                <h3>Stargram Plus</h3>
+                <p>Премиум возможности уже ждут вас!</p>
+                <button class="btn-premium">Попробовать</button>
+                <span class="close-banner">✕</span>
+            </div>
+        </div>
         
-        data = {
-            'pipeline_id': (None, pipeline),
-            'params': (None, str(params).replace("'", '"'), 'application/json')
-        }
+        <!-- Экран нейросетей -->
+        <div id="neural-screen" class="screen hidden">
+            <!-- Реализация чата и генерации изображений -->
+        </div>
         
-        response = requests.post(
-            self.URL + 'key/api/v1/pipeline/run', 
-            headers=self.AUTH_HEADERS, 
-            files=data
-        )
-        data = response.json()
-        return data['uuid'] if 'uuid' in data else None
-    
-    def check_generation(self, request_id, attempts=10, delay=10):
-        while attempts > 0:
-            response = requests.get(
-                self.URL + 'key/api/v1/pipeline/status/' + request_id, 
-                headers=self.AUTH_HEADERS
-            )
-            data = response.json()
-            if data['status'] == 'DONE':
-                return data['result']['files'][0] if data['result']['files'] else None
-            attempts -= 1
-            time.sleep(delay)
-        return None
-
-class OpenRouterAPI:
-    def __init__(self):
-        self.URL = 'https://openrouter.ai/api/v1/chat/completions'
-        self.HEADERS = {
-            'Authorization': f'Bearer {config.OPENROUTER_API_KEY}',
-            'HTTP-Referer': config.WEBAPP_URL,
-            'X-Title': 'Stargram'
-        }
-    
-    def chat_completion(self, messages, model="deepseek/deepseek-v3-base:free", max_tokens=2000):
-        payload = {
-            "model": model,
-            "messages": messages,
-            "max_tokens": max_tokens
-        }
+        <!-- Starmap -->
+        <div id="starmap-screen" class="screen hidden">
+            <div id="map"></div>
+            <div class="map-controls">
+                <button id="points-list-btn">Точки</button>
+                <button id="friends-list-btn">Друзья</button>
+            </div>
+        </div>
         
-        response = requests.post(self.URL, headers=self.HEADERS, json=payload)
-        data = response.json()
+        <!-- Магазин -->
+        <div id="shop-screen" class="screen hidden">
+            <!-- Товары и премиум подписка -->
+        </div>
         
-        if 'choices' in data and data['choices']:
-            return data['choices'][0]['message']['content']
-        return None
-
-class CozeAPI:
-    def __init__(self):
-        self.URL = 'https://api.coze.com/v3/chat'
-        self.HEADERS = {
-            'Authorization': f'Bearer {config.COZE_API_KEY}',
-            'Content-Type': 'application/json'
-        }
-        self.BOT_ID = config.COZE_AGENT_ID
+        <!-- Профиль -->
+        <div id="profile-screen" class="screen hidden">
+            <!-- Статистика и настройки -->
+        </div>
+    </div>
     
-    def check_complaint(self, user_id, message_text):
-        payload = {
-            "bot_id": self.BOT_ID,
-            "user_id": str(user_id),
-            "message": {
-                "content": message_text,
-                "type": "text"
-            }
-        }
-        
-        response = requests.post(self.URL, headers=self.HEADERS, json=payload)
-        data = response.json()
-        
-        if 'output' in data and 'text' in data['output']:
-            return "approve" if "approve" in data['output']['text'].lower() else "reject"
-        return "reject"
-
-class GeoAPI:
-    @staticmethod
-    def get_address(lat, lon):
-        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
-        response = requests.get(url)
-        data = response.json()
-        return data.get('display_name', 'Неизвестный адрес')
-    
-    @staticmethod
-    def generate_points(lat, lon, count=5, radius=5000):
-        # Generate random points in parks near user
-        points = []
-        for _ in range(count):
-            # Simple random point generation (in real app use OSM data)
-            new_lat = lat + (random.uniform(-0.1, 0.1))
-            new_lon = lon + (random.uniform(-0.1, 0.1))
-            address = GeoAPI.get_address(new_lat, new_lon)
-            value = random.randint(10000, 25000) if random.random() > 0.5 else random.randint(20000, 35000)
-            points.append((new_lat, new_lon, address, value))
-        return points
-
-class PaymentSystem:
-    @staticmethod
-    def create_invoice(user_id, amount, currency, description):
-        # In real app integrate with payment provider
-        return f"{config.WEBAPP_URL}/payment/{user_id}/{uuid.uuid4()}"
-    
-    @staticmethod
-    def check_payment(invoice_id):
-        # In real app check payment status
-        return True
+    <script src="app.js"></script>
+</body>
+</html>
